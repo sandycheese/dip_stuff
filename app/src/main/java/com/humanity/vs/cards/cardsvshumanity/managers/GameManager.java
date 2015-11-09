@@ -4,10 +4,10 @@ import com.humanity.vs.cards.cardsvshumanity.entities.Card;
 import com.humanity.vs.cards.cardsvshumanity.entities.MatchRules;
 import com.humanity.vs.cards.cardsvshumanity.entities.GameClient;
 import com.humanity.vs.cards.cardsvshumanity.entities.Player;
-import com.humanity.vs.cards.cardsvshumanity.entities_json.JsonPlayerCards;
-import com.humanity.vs.cards.cardsvshumanity.entities_json.JsonPlayerRoundWinner;
-import com.humanity.vs.cards.cardsvshumanity.entities_json.JsonPlayerSelectedWhiteCards;
-import com.humanity.vs.cards.cardsvshumanity.entities_json.JsonPlayersStates;
+import com.humanity.vs.cards.cardsvshumanity.entities_json.JsonGameStage1Data;
+import com.humanity.vs.cards.cardsvshumanity.entities_json.JsonGameStage2Data;
+import com.humanity.vs.cards.cardsvshumanity.entities_json.JsonGameStage3Data;
+import com.humanity.vs.cards.cardsvshumanity.entities_json.JsonGameStage4Data;
 import com.humanity.vs.cards.cardsvshumanity.enums.NetworkGameCommand;
 import com.humanity.vs.cards.cardsvshumanity.helpers.GameManagerHelper;
 import com.humanity.vs.cards.cardsvshumanity.interfaces.INetworkGameCommandsHandler;
@@ -23,6 +23,7 @@ import java.util.List;
  */
 // todo null & empty checks everywhere? is it worth it?
 // todo add errors texts
+// todo game will absolutely not cheat-protected (code simplicity over complexity. i don't like mind blowing when i read code)
 public class GameManager implements INetworkGameCommandsHandler {
 
     private List<Player> players;
@@ -90,51 +91,35 @@ public class GameManager implements INetworkGameCommandsHandler {
     }
 
 
-    public void net_step0_host_updatePlayersState_cmd() {
+    private void networkGameStage1_host_cmd() {
 
     }
 
-    public void net_step1_host_resupplyPlayerCards_cmd() {
+    private void networkGameStage1_client_handler(JsonGameStage1Data jsonGameStage1Data) {
 
     }
 
-    public void net_step2_host_grantPermissionToChooseWhiteCards_cmd() {
+    private void networkGameStage2_client_cmd() {
 
     }
 
-    public void net_step3_client_sendBackSelectedWhiteCards_cmd() {
+    private void networkGameStage2_host_handler(JsonGameStage2Data jsonGameStage2Data) {
 
     }
 
-    public void net_step4_host_grantPermissionToChooseRoundWinner_cmd() {
+    private void networkGameStage3_host_cmd() {
 
     }
 
-    public void net_step5_client_sendBackRoundWinner_cmd() {
+    private void networkGameStage3_client_handler(JsonGameStage3Data jsonGameStage3Data) {
 
     }
 
-    public void net_step0_host_updatePlayersState_handler(JsonPlayersStates jsonPlayersStates) {
+    private void networkGameStage4_client_cmd() {
 
     }
 
-    public void net_step1_host_resupplyPlayerCards_handler(JsonPlayerCards jsonPlayerCards) {
-
-    }
-
-    public void net_step2_host_grantPermissionToChooseWhiteCards_handler() {
-
-    }
-
-    public void net_step3_client_sendBackSelectedWhiteCards_handler(JsonPlayerSelectedWhiteCards jsonPlayerSelectedWhiteCards) {
-
-    }
-
-    public void net_step4_host_grantPermissionToChooseRoundWinner_handler() {
-
-    }
-
-    public void net_step5_client_sendBackRoundWinner_handler(JsonPlayerRoundWinner jsonPlayerRoundWinner) {
+    private void networkGameStage4_host_handler(JsonGameStage4Data jsonGameStage4Data) {
 
     }
 
@@ -145,27 +130,21 @@ public class GameManager implements INetworkGameCommandsHandler {
     @Override
     public void handleNetworkGameCommand(NetworkGameCommand networkGameCommand, String jsonData) {
         switch (networkGameCommand) {
-            case net_step0_host_updatePlayersState:
-                JsonPlayersStates jsonPlayersStates = GameManagerHelper.getPlayerStatesFromJson(jsonData);
-                net_step0_host_updatePlayersState_handler(jsonPlayersStates);
+            case gameStage1:
+                JsonGameStage1Data jsonGameStage1Data = GameManagerHelper.getStage1DataFromJson(jsonData);
+                networkGameStage1_client_handler(jsonGameStage1Data);
                 break;
-            case net_step1_host_resupplyPlayerCards:
-                JsonPlayerCards jsonPlayerCards = GameManagerHelper.getPlayerCardsFromJson(jsonData);
-                net_step1_host_resupplyPlayerCards_handler(jsonPlayerCards);
+            case gameStage2:
+                JsonGameStage2Data jsonGameStage2Data = GameManagerHelper.getStage2DataFromJson(jsonData);
+                networkGameStage2_host_handler(jsonGameStage2Data);
                 break;
-            case net_step2_host_grantPermissionToChooseWhiteCards:
-                net_step2_host_grantPermissionToChooseWhiteCards_handler();
+            case gameStage3:
+                JsonGameStage3Data jsonGameStage3Data = GameManagerHelper.getStage3DataFromJson(jsonData);
+                networkGameStage3_client_handler(jsonGameStage3Data);
                 break;
-            case net_step3_client_sendBackSelectedWhiteCards:
-                JsonPlayerSelectedWhiteCards jsonPlayerSelectedWhiteCards = GameManagerHelper.getPlayerSelectedWhiteCardsFromJson(jsonData);
-                net_step3_client_sendBackSelectedWhiteCards_handler(jsonPlayerSelectedWhiteCards);
-                break;
-            case net_step4_host_grantPermissionToChooseRoundWinner:
-                net_step4_host_grantPermissionToChooseRoundWinner_handler();
-                break;
-            case net_step5_client_sendBackRoundWinner:
-                JsonPlayerRoundWinner jsonPlayerRoundWinner = GameManagerHelper.getPlayerRoundWinner(jsonData);
-                net_step5_client_sendBackRoundWinner_handler(jsonPlayerRoundWinner);
+            case gameStage4:
+                JsonGameStage4Data jsonGameStage4Data = GameManagerHelper.getStage4DataFromJson(jsonData);
+                networkGameStage4_host_handler(jsonGameStage4Data);
                 break;
         }
     }
