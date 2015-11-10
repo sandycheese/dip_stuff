@@ -10,7 +10,10 @@ import com.humanity.vs.cards.cardsvshumanity.entities_json.JsonGameStage4Data;
  */
 public interface IGameUIUpdater {
     void makeStage1Updates(JsonGameStage1Data jsonGameStage1Data);
-    void makeStage2Updates(JsonGameStage2Data jsonGameStage2Data);
+
+    void makeStage2Updates(JsonGameStage2Data jsonGameStage2Data, IStageCallback stageCallback);
+
     void makeStage3Updates(JsonGameStage3Data jsonGameStage3Data);
-    void makeStage4Updates(JsonGameStage4Data jsonGameStage4Data);
+
+    void makeStage4Updates(JsonGameStage4Data jsonGameStage4Data, IStageCallback stageCallback);
 }

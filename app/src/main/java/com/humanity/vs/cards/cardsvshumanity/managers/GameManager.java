@@ -11,12 +11,15 @@ import com.humanity.vs.cards.cardsvshumanity.entities_json.JsonGameStage1Data;
 import com.humanity.vs.cards.cardsvshumanity.entities_json.JsonGameStage2Data;
 import com.humanity.vs.cards.cardsvshumanity.entities_json.JsonGameStage3Data;
 import com.humanity.vs.cards.cardsvshumanity.entities_json.JsonGameStage4Data;
+import com.humanity.vs.cards.cardsvshumanity.entities_json.JsonRoundWinnerSelection;
+import com.humanity.vs.cards.cardsvshumanity.entities_json.JsonWhiteCardsSelection;
 import com.humanity.vs.cards.cardsvshumanity.enums.NetworkGameCommand;
 import com.humanity.vs.cards.cardsvshumanity.enums.NetworkGameCommandDirection;
 import com.humanity.vs.cards.cardsvshumanity.helpers.GameManagerHelper;
 import com.humanity.vs.cards.cardsvshumanity.interfaces.IGameUIUpdater;
 import com.humanity.vs.cards.cardsvshumanity.interfaces.INetworkGameCommandsHandler;
 import com.humanity.vs.cards.cardsvshumanity.interfaces.INetworkGameCommandsSender;
+import com.humanity.vs.cards.cardsvshumanity.interfaces.IStageCallback;
 import com.humanity.vs.cards.cardsvshumanity.utils.EmptyUtils;
 
 import java.util.ArrayList;
@@ -28,7 +31,7 @@ import java.util.List;
  */
 // todo null & empty checks everywhere? is it worth it?
 // todo add errors texts
-// todo game will absolutely not cheat-protected (code simplicity over complexity. i don't like mind blowing when i read code)
+// todo game will absolutely not cheat-protected (code simplicity over complexity. i don't like a mind blowing when i read a code)
 public class GameManager implements INetworkGameCommandsHandler {
 
     private static final String TAG = "ddd";
@@ -41,6 +44,17 @@ public class GameManager implements INetworkGameCommandsHandler {
     private IGameUIUpdater gameUIUpdater;
     private boolean isHost;
     private List<PlayerState> playersStates;
+    private IStageCallback stageCallback = new IStageCallback() {
+        @Override
+        public void stage2_send_white_cards_selection(JsonWhiteCardsSelection jsonWhiteCardsSelection) {
+            stage2_send_white_cards_selection(jsonWhiteCardsSelection);
+        }
+
+        @Override
+        public void stage4_send_selected_round_winner(JsonRoundWinnerSelection jsonRoundWinnerSelection) {
+            stage4_send_selected_round_winner(jsonRoundWinnerSelection);
+        }
+    };
 
     public void newGameAsHost(INetworkGameCommandsSender networkGameCommandsSender, IGameUIUpdater gameUIUpdater, List<GameClient> gameClients, List<Card> cards, MatchRules matchRules) {
         this.networkCommandsSender = networkCommandsSender;
@@ -129,7 +143,6 @@ public class GameManager implements INetworkGameCommandsHandler {
     }
 
     private void networkGameStage1_client_handler(JsonGameStage1Data jsonGameStage1Data) {
-        GameManagerHelper.handleStage1Data(this, jsonGameStage1Data);
         gameUIUpdater.makeStage1Updates(jsonGameStage1Data);
     }
 
@@ -145,8 +158,7 @@ public class GameManager implements INetworkGameCommandsHandler {
     }
 
     private void networkGameStage2_host_handler(JsonGameStage2Data jsonGameStage2Data) {
-        GameManagerHelper.handleStage2Data(this, jsonGameStage2Data);
-        gameUIUpdater.makeStage2Updates(jsonGameStage2Data);
+        gameUIUpdater.makeStage2Updates(jsonGameStage2Data, stageCallback);
     }
 
     // STAGE 3: playerStates see chosen white cards;
@@ -164,7 +176,6 @@ public class GameManager implements INetworkGameCommandsHandler {
     }
 
     private void networkGameStage3_client_handler(JsonGameStage3Data jsonGameStage3Data) {
-        GameManagerHelper.handleStage3Data(this, jsonGameStage3Data);
         gameUIUpdater.makeStage3Updates(jsonGameStage3Data);
     }
 
@@ -180,8 +191,7 @@ public class GameManager implements INetworkGameCommandsHandler {
     }
 
     private void networkGameStage4_host_handler(JsonGameStage4Data jsonGameStage4Data) {
-        GameManagerHelper.handleStage4Data(this, jsonGameStage4Data);
-        gameUIUpdater.makeStage4Updates(jsonGameStage4Data);
+        gameUIUpdater.makeStage4Updates(jsonGameStage4Data, stageCallback);
     }
 
     @Override

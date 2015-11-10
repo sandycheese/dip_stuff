@@ -114,28 +114,13 @@ public class GameManagerHelper {
         return null;
     }
 
+    // host only
     public static JsonGameStage1Data getStage3Data(GameManager gameManager) {
         return null;
     }
 
     public static JsonGameStage1Data getStage4Data(GameManager gameManager) {
         return null;
-    }
-
-    public static void handleStage1Data(GameManager gameManager, JsonGameStage1Data jsonGameStage1Data) {
-
-    }
-
-    public static void handleStage2Data(GameManager gameManager, JsonGameStage2Data jsonGameStage2Data) {
-
-    }
-
-    public static void handleStage3Data(GameManager gameManager, JsonGameStage3Data jsonGameStage3Data) {
-
-    }
-
-    public static void handleStage4Data(GameManager gameManager, JsonGameStage4Data jsonGameStage4Data) {
-
     }
 
     public static List<Card> getBlackCardsFromList(List<Card> cards) {
