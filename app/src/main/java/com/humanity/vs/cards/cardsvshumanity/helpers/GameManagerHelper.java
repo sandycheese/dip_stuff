@@ -6,6 +6,7 @@ import com.humanity.vs.cards.cardsvshumanity.entities_json.JsonGameStage1Data;
 import com.humanity.vs.cards.cardsvshumanity.entities_json.JsonGameStage2Data;
 import com.humanity.vs.cards.cardsvshumanity.entities_json.JsonGameStage3Data;
 import com.humanity.vs.cards.cardsvshumanity.entities_json.JsonGameStage4Data;
+import com.humanity.vs.cards.cardsvshumanity.managers.GameManager;
 
 /**
  * Created by robot on 08.11.15.
@@ -42,5 +43,21 @@ public class GameManagerHelper {
         } catch (JsonSyntaxException e) {
             return null;
         }
+    }
+
+    public static JsonGameStage1Data getStage1Data(GameManager gameManager) {
+        return null;
+    }
+
+    public static JsonGameStage1Data getStage2Data(GameManager gameManager) {
+        return null;
+    }
+
+    public static JsonGameStage1Data getStage3Data(GameManager gameManager) {
+        return null;
+    }
+
+    public static JsonGameStage1Data getStage4Data(GameManager gameManager) {
+        return null;
     }
 }
