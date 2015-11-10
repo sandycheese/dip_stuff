@@ -1,5 +1,6 @@
 package com.humanity.vs.cards.cardsvshumanity.managers;
 
+import com.google.gson.Gson;
 import com.humanity.vs.cards.cardsvshumanity.entities.Card;
 import com.humanity.vs.cards.cardsvshumanity.entities.MatchRules;
 import com.humanity.vs.cards.cardsvshumanity.entities.GameClient;
@@ -11,7 +12,7 @@ import com.humanity.vs.cards.cardsvshumanity.entities_json.JsonGameStage4Data;
 import com.humanity.vs.cards.cardsvshumanity.enums.NetworkGameCommand;
 import com.humanity.vs.cards.cardsvshumanity.helpers.GameManagerHelper;
 import com.humanity.vs.cards.cardsvshumanity.interfaces.INetworkGameCommandsHandler;
-import com.humanity.vs.cards.cardsvshumanity.interfaces.INetworkCommandsSender;
+import com.humanity.vs.cards.cardsvshumanity.interfaces.INetworkGameCommandsSender;
 import com.humanity.vs.cards.cardsvshumanity.utils.EmptyUtils;
 
 import java.util.ArrayList;
@@ -29,14 +30,13 @@ public class GameManager implements INetworkGameCommandsHandler {
     private List<Player> players;
     private List<Card> cards;
     private MatchRules matchRules;
-    private INetworkCommandsSender networkCommandsSender;
+    private INetworkGameCommandsSender networkCommandsSender;
+    private boolean isHost;
 
-    public GameManager(INetworkCommandsSender networkCommandsSender) {
+    public void newGameAsHost(INetworkGameCommandsSender networkGameCommandsSender, List<GameClient> gameClients, List<Card> cards, MatchRules matchRules) {
+        this.networkCommandsSender = networkCommandsSender;
+        this.isHost = false;
 
-        this.networkCommandsSender = this.networkCommandsSender;
-    }
-
-    public void newGame(List<GameClient> gameClients, List<Card> cards, MatchRules matchRules) {
         this.cards = cards;
         this.matchRules = matchRules;
 
@@ -48,6 +48,11 @@ public class GameManager implements INetworkGameCommandsHandler {
         createPlayersList(gameClients);
         definePlayersOrder();
         startGameReactiveLoop();
+    }
+
+    public void newGameAsClient(INetworkGameCommandsSender networkGameCommandsSender) {
+        this.networkCommandsSender = networkCommandsSender;
+        this.isHost = false;
     }
 
     private boolean isGameDataOk(List<GameClient> gameClients, List<Card> cards, MatchRules matchRules) {
@@ -79,20 +84,20 @@ public class GameManager implements INetworkGameCommandsHandler {
         for (int i = 0; i < players.size(); i++) {
             players.get(i).setOrderInRound(orderNumbers.get(i));
         }
-
     }
 
     private void startGameReactiveLoop() {
-        networkCommandsSender.net_step0_host_updatePlayersState_cmd();
+        networkGameStage1_host_cmd();
     }
-
-    void error() {
-        throw new UnsupportedOperationException();
-    }
-
 
     private void networkGameStage1_host_cmd() {
+        JsonGameStage1Data data = GameManagerHelper.getStage1Data(this);
+        String jsonData = new Gson().toJson(data, JsonGameStage1Data.class);
 
+        if (isHost)
+            networkGameStage1_client_handler(data);
+        else
+            networkCommandsSender.sendNetworkGameCommand(NetworkGameCommand.gameStage1, jsonData);
     }
 
     private void networkGameStage1_client_handler(JsonGameStage1Data jsonGameStage1Data) {
@@ -100,7 +105,13 @@ public class GameManager implements INetworkGameCommandsHandler {
     }
 
     private void networkGameStage2_client_cmd() {
+        JsonGameStage1Data data = GameManagerHelper.getStage2Data(this);
+        String jsonData = new Gson().toJson(data, JsonGameStage1Data.class);
 
+        if (isHost)
+            networkGameStage1_client_handler(data);
+        else
+            networkCommandsSender.sendNetworkGameCommand(NetworkGameCommand.gameStage2, jsonData);
     }
 
     private void networkGameStage2_host_handler(JsonGameStage2Data jsonGameStage2Data) {
@@ -108,7 +119,13 @@ public class GameManager implements INetworkGameCommandsHandler {
     }
 
     private void networkGameStage3_host_cmd() {
+        JsonGameStage1Data data = GameManagerHelper.getStage3Data(this);
+        String jsonData = new Gson().toJson(data, JsonGameStage1Data.class);
 
+        if (isHost)
+            networkGameStage1_client_handler(data);
+        else
+            networkCommandsSender.sendNetworkGameCommand(NetworkGameCommand.gameStage3, jsonData);
     }
 
     private void networkGameStage3_client_handler(JsonGameStage3Data jsonGameStage3Data) {
@@ -116,14 +133,16 @@ public class GameManager implements INetworkGameCommandsHandler {
     }
 
     private void networkGameStage4_client_cmd() {
+        JsonGameStage1Data data = GameManagerHelper.getStage4Data(this);
+        String jsonData = new Gson().toJson(data, JsonGameStage1Data.class);
 
+        if (isHost)
+            networkGameStage1_client_handler(data);
+        else
+            networkCommandsSender.sendNetworkGameCommand(NetworkGameCommand.gameStage4, jsonData);
     }
 
     private void networkGameStage4_host_handler(JsonGameStage4Data jsonGameStage4Data) {
-
-    }
-
-    void sendNetworkCommand(NetworkGameCommand networkGameCommand, String jsonData) {
 
     }
 
@@ -148,4 +167,9 @@ public class GameManager implements INetworkGameCommandsHandler {
                 break;
         }
     }
+
+    void error() {
+        throw new UnsupportedOperationException();
+    }
+
 }
