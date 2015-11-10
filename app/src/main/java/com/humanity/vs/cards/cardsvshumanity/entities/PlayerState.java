@@ -6,20 +6,18 @@ import java.util.List;
 /**
  * Created by robot on 08.11.15.
  */
-public class Player {
-    String id;
-    String nickname;
-    int orderInRound;
-    List<Card> cards;
+public class PlayerState {
+    public String id;
+    public String nickname;
+    public int order;
+    public int score;
+    public boolean isKing;
 
-    public Player(String id, String nickname) {
+    public List<Card> cards;
+
+    public PlayerState(String id, String nickname) {
         this.id = id;
         this.nickname = nickname;
-
         this.cards = new ArrayList<>();
-    }
-
-    public void setOrderInRound(int orderInRound) {
-        this.orderInRound = orderInRound;
     }
 }

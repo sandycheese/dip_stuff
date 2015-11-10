@@ -1,6 +1,7 @@
 package com.humanity.vs.cards.cardsvshumanity.helpers;
 
 import com.humanity.vs.cards.cardsvshumanity.enums.NetworkGameCommand;
+import com.humanity.vs.cards.cardsvshumanity.enums.NetworkGameCommandDirection;
 import com.humanity.vs.cards.cardsvshumanity.interfaces.INetworkGameCommandsSender;
 
 /**
@@ -8,7 +9,7 @@ import com.humanity.vs.cards.cardsvshumanity.interfaces.INetworkGameCommandsSend
  */
 public class NetworkGameCommandsSender implements INetworkGameCommandsSender {
     @Override
-    public void sendNetworkGameCommand(NetworkGameCommand networkGameCommand, String jsonData) {
+    public void sendNetworkGameCommand(NetworkGameCommand networkGameCommand, String jsonData, NetworkGameCommandDirection direction) {
 
     }
 }
