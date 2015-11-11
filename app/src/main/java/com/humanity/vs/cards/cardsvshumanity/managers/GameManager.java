@@ -46,13 +46,13 @@ public class GameManager implements INetworkGameCommandsHandler {
     private List<PlayerState> playersStates;
     private IStageCallback stageCallback = new IStageCallback() {
         @Override
-        public void stage2_send_white_cards_selection(JsonWhiteCardsSelection jsonWhiteCardsSelection) {
-            stage2_send_white_cards_selection(jsonWhiteCardsSelection);
+        public void stage2_send_white_cards_selection(JsonGameStage2Data jsonGameStage2Data) {
+            networkGameStage2_client_cmd(jsonGameStage2Data);
         }
 
         @Override
-        public void stage4_send_selected_round_winner(JsonRoundWinnerSelection jsonRoundWinnerSelection) {
-            stage4_send_selected_round_winner(jsonRoundWinnerSelection);
+        public void stage4_send_selected_round_winner(JsonGameStage4Data jsonGameStage4Data) {
+            networkGameStage4_client_cmd(jsonGameStage4Data);
         }
     };
 
@@ -147,12 +147,11 @@ public class GameManager implements INetworkGameCommandsHandler {
     }
 
     // STAGE 2: playerStates sends back selected white cards; host handles this;
-    private void networkGameStage2_client_cmd() {
-        JsonGameStage1Data data = GameManagerHelper.getStage2Data(this);
+    private void networkGameStage2_client_cmd(JsonGameStage2Data data) {
         String jsonData = new Gson().toJson(data, JsonGameStage1Data.class);
 
         if (isHost)
-            networkGameStage1_client_handler(data);
+            networkGameStage2_host_handler(data);
         else
             networkCommandsSender.sendNetworkGameCommand(NetworkGameCommand.gameStage2, jsonData, NetworkGameCommandDirection.toHost);
     }
@@ -168,10 +167,10 @@ public class GameManager implements INetworkGameCommandsHandler {
             return;
         }
 
-        JsonGameStage1Data data = GameManagerHelper.getStage3Data(this);
+        JsonGameStage3Data data = GameManagerHelper.getStage3Data(this);
         String jsonData = new Gson().toJson(data, JsonGameStage1Data.class);
 
-        networkGameStage1_client_handler(data);
+        networkGameStage3_client_handler(data);
         networkCommandsSender.sendNetworkGameCommand(NetworkGameCommand.gameStage3, jsonData, NetworkGameCommandDirection.toClients);
     }
 
@@ -180,12 +179,11 @@ public class GameManager implements INetworkGameCommandsHandler {
     }
 
     // STAGE 4: the king selects a round winner;
-    private void networkGameStage4_client_cmd() {
-        JsonGameStage1Data data = GameManagerHelper.getStage4Data(this);
+    private void networkGameStage4_client_cmd(JsonGameStage4Data data) {
         String jsonData = new Gson().toJson(data, JsonGameStage1Data.class);
 
         if (isHost)
-            networkGameStage1_client_handler(data);
+            networkGameStage4_host_handler(data);
         else
             networkCommandsSender.sendNetworkGameCommand(NetworkGameCommand.gameStage4, jsonData, NetworkGameCommandDirection.toHost);
     }

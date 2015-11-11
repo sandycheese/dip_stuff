@@ -110,16 +110,16 @@ public class GameManagerHelper {
         return data;
     }
 
-    public static JsonGameStage1Data getStage2Data(GameManager gameManager) {
+    public static JsonGameStage2Data getStage2Data(GameManager gameManager) {
         return null;
     }
 
     // host only
-    public static JsonGameStage1Data getStage3Data(GameManager gameManager) {
+    public static JsonGameStage3Data getStage3Data(GameManager gameManager) {
         return null;
     }
 
-    public static JsonGameStage1Data getStage4Data(GameManager gameManager) {
+    public static JsonGameStage4Data getStage4Data(GameManager gameManager) {
         return null;
     }
 
