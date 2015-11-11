@@ -8,4 +8,6 @@ public class JsonGameStage1Data {
     public JsonCard blackCard;
     public JsonPlayersWhiteDeck[] playersWhiteDecks;
     public JsonPlayerState[] playerStates;
+    public JsonRoundResult roundResult;
+    public boolean endGame;
 }

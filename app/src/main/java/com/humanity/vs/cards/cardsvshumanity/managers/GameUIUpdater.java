@@ -4,6 +4,7 @@ import com.humanity.vs.cards.cardsvshumanity.entities_json.JsonGameStage1Data;
 import com.humanity.vs.cards.cardsvshumanity.entities_json.JsonGameStage2Data;
 import com.humanity.vs.cards.cardsvshumanity.entities_json.JsonGameStage3Data;
 import com.humanity.vs.cards.cardsvshumanity.entities_json.JsonGameStage4Data;
+import com.humanity.vs.cards.cardsvshumanity.interfaces.IClientStageCallback;
 import com.humanity.vs.cards.cardsvshumanity.interfaces.IGameUIUpdater;
 
 /**
@@ -12,7 +13,7 @@ import com.humanity.vs.cards.cardsvshumanity.interfaces.IGameUIUpdater;
 public class GameUIUpdater implements IGameUIUpdater {
 
     @Override
-    public void makeStage1Updates(JsonGameStage1Data jsonGameStage1Data) {
+    public void makeStage1Updates(JsonGameStage1Data jsonGameStage1Data, IClientStageCallback clientStageCallback) {
 
     }
 

@@ -1,5 +1,7 @@
 package com.humanity.vs.cards.cardsvshumanity.helpers;
 
+import android.util.Log;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.humanity.vs.cards.cardsvshumanity.entities.Card;
@@ -9,8 +11,12 @@ import com.humanity.vs.cards.cardsvshumanity.entities_json.JsonGameStage1Data;
 import com.humanity.vs.cards.cardsvshumanity.entities_json.JsonGameStage2Data;
 import com.humanity.vs.cards.cardsvshumanity.entities_json.JsonGameStage3Data;
 import com.humanity.vs.cards.cardsvshumanity.entities_json.JsonGameStage4Data;
+import com.humanity.vs.cards.cardsvshumanity.entities_json.JsonMatchRules;
 import com.humanity.vs.cards.cardsvshumanity.entities_json.JsonPlayerState;
 import com.humanity.vs.cards.cardsvshumanity.entities_json.JsonPlayersWhiteDeck;
+import com.humanity.vs.cards.cardsvshumanity.entities_json.JsonRoundResult;
+import com.humanity.vs.cards.cardsvshumanity.entities_json.JsonWhiteCardsSelection;
+import com.humanity.vs.cards.cardsvshumanity.interfaces.IHostStageCallback;
 import com.humanity.vs.cards.cardsvshumanity.managers.GameManager;
 
 import java.util.ArrayList;
@@ -21,6 +27,7 @@ import java.util.Random;
  * Created by robot on 08.11.15.
  */
 public class GameManagerHelper {
+    private static final String TAG = "ddd";
 
     private static final int PLAYER_CARDS_COUNT = 10;
 
@@ -68,6 +75,8 @@ public class GameManagerHelper {
         Card blackCard = blackCards.get(new Random().nextInt(blackCards.size()));
         unusedCards.remove(blackCard);
 
+        gameManager.setCurrentBlackCard(new JsonCard(blackCard));
+
         data.blackCard = new JsonCard(blackCard);
 
 
@@ -107,20 +116,78 @@ public class GameManagerHelper {
         data.playerStates = jsonPlayerStates;
 
 
+        // round result
+        JsonRoundResult jsonRoundResult = gameManager.getRoundResult();
+        data.roundResult = jsonRoundResult;
+
+
+        // end game
+        data.endGame = false;
+        for (PlayerState p : playersStates) {
+            if (p.score == gameManager.getMatchRules().scoreToWin) {
+                data.endGame = true;
+            }
+        }
+
+
         return data;
     }
 
-    public static JsonGameStage2Data getStage2Data(GameManager gameManager) {
-        return null;
+    // host only
+    public static void handleStage2Data(GameManager gameManager, JsonGameStage2Data jsonGameStage2Data, IHostStageCallback hostStageCallback) {
+        List<JsonWhiteCardsSelection> currentSelections = gameManager.getCurrentWhiteCardsSelections();
+        List<PlayerState> playerStates = gameManager.getPlayersStates();
+
+        if (currentSelections.size() >= playerStates.size()) {
+            Log.d(TAG, "Invalid behavior");
+            return;
+        }
+
+        // adding a player selection
+        currentSelections.add(jsonGameStage2Data.whiteCardsSelection);
+
+        // call a next stage if all done
+        if (currentSelections.size() == playerStates.size()) {
+            hostStageCallback.stage3_cmd();
+        }
     }
 
     // host only
     public static JsonGameStage3Data getStage3Data(GameManager gameManager) {
-        return null;
+        List<JsonWhiteCardsSelection> selections = gameManager.getCurrentWhiteCardsSelections();
+        JsonGameStage3Data jsonGameStage3Data = new JsonGameStage3Data();
+        jsonGameStage3Data.whiteCardsSelections = new JsonWhiteCardsSelection[selections.size()];
+        for (int i = 0; i < selections.size(); i++) {
+            jsonGameStage3Data.whiteCardsSelections[i] = selections.get(i);
+        }
+
+        selections.clear();
+
+        return jsonGameStage3Data;
     }
 
-    public static JsonGameStage4Data getStage4Data(GameManager gameManager) {
-        return null;
+    // host only
+    public static void handleStage4Data(GameManager gameManager, JsonGameStage4Data jsonGameStage4Data, IHostStageCallback hostStageCallback) {
+        String winnerId = jsonGameStage4Data.whiteCardsSelection.playerId;
+
+        List<PlayerState> playerStates = gameManager.getPlayersStates();
+
+        // adding a score
+        for (PlayerState p : playerStates) {
+            if (p.id.equals(winnerId)) {
+                p.score++;
+                break;
+            }
+        }
+
+        // set round result
+        JsonRoundResult jsonRoundResult = new JsonRoundResult();
+        jsonRoundResult.blackCard = gameManager.getCurrentBlackCard();
+        jsonRoundResult.kingSelectedWhiteCards = jsonGameStage4Data.whiteCardsSelection;
+        gameManager.setRoundResult(jsonRoundResult);
+
+        // start from beginning
+        hostStageCallback.stage1_cmd();
     }
 
     public static List<Card> getBlackCardsFromList(List<Card> cards) {
@@ -142,4 +209,6 @@ public class GameManagerHelper {
 
         return whiteCards;
     }
+
+
 }

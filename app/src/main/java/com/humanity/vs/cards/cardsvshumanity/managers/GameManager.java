@@ -7,19 +7,21 @@ import com.humanity.vs.cards.cardsvshumanity.entities.Card;
 import com.humanity.vs.cards.cardsvshumanity.entities.MatchRules;
 import com.humanity.vs.cards.cardsvshumanity.entities.GameClient;
 import com.humanity.vs.cards.cardsvshumanity.entities.PlayerState;
+import com.humanity.vs.cards.cardsvshumanity.entities_json.JsonCard;
 import com.humanity.vs.cards.cardsvshumanity.entities_json.JsonGameStage1Data;
 import com.humanity.vs.cards.cardsvshumanity.entities_json.JsonGameStage2Data;
 import com.humanity.vs.cards.cardsvshumanity.entities_json.JsonGameStage3Data;
 import com.humanity.vs.cards.cardsvshumanity.entities_json.JsonGameStage4Data;
-import com.humanity.vs.cards.cardsvshumanity.entities_json.JsonRoundWinnerSelection;
+import com.humanity.vs.cards.cardsvshumanity.entities_json.JsonRoundResult;
 import com.humanity.vs.cards.cardsvshumanity.entities_json.JsonWhiteCardsSelection;
 import com.humanity.vs.cards.cardsvshumanity.enums.NetworkGameCommand;
 import com.humanity.vs.cards.cardsvshumanity.enums.NetworkGameCommandDirection;
 import com.humanity.vs.cards.cardsvshumanity.helpers.GameManagerHelper;
 import com.humanity.vs.cards.cardsvshumanity.interfaces.IGameUIUpdater;
+import com.humanity.vs.cards.cardsvshumanity.interfaces.IHostStageCallback;
 import com.humanity.vs.cards.cardsvshumanity.interfaces.INetworkGameCommandsHandler;
 import com.humanity.vs.cards.cardsvshumanity.interfaces.INetworkGameCommandsSender;
-import com.humanity.vs.cards.cardsvshumanity.interfaces.IStageCallback;
+import com.humanity.vs.cards.cardsvshumanity.interfaces.IClientStageCallback;
 import com.humanity.vs.cards.cardsvshumanity.utils.EmptyUtils;
 
 import java.util.ArrayList;
@@ -44,7 +46,9 @@ public class GameManager implements INetworkGameCommandsHandler {
     private IGameUIUpdater gameUIUpdater;
     private boolean isHost;
     private List<PlayerState> playersStates;
-    private IStageCallback stageCallback = new IStageCallback() {
+    private List<JsonWhiteCardsSelection> currentWhiteCardsSelections = new ArrayList<>();
+
+    private IClientStageCallback clientStageCallback = new IClientStageCallback() {
         @Override
         public void stage2_send_white_cards_selection(JsonGameStage2Data jsonGameStage2Data) {
             networkGameStage2_client_cmd(jsonGameStage2Data);
@@ -54,7 +58,25 @@ public class GameManager implements INetworkGameCommandsHandler {
         public void stage4_send_selected_round_winner(JsonGameStage4Data jsonGameStage4Data) {
             networkGameStage4_client_cmd(jsonGameStage4Data);
         }
+
+        @Override
+        public void endGame() {
+            endGame();
+        }
     };
+    private IHostStageCallback hostStageCallback = new IHostStageCallback() {
+        @Override
+        public void stage1_cmd() {
+            networkGameStage1_host_cmd();
+        }
+
+        @Override
+        public void stage3_cmd() {
+            networkGameStage3_host_cmd();
+        }
+    };
+    private JsonCard currentBlackCard;
+    private JsonRoundResult roundResult;
 
     public void newGameAsHost(INetworkGameCommandsSender networkGameCommandsSender, IGameUIUpdater gameUIUpdater, List<GameClient> gameClients, List<Card> cards, MatchRules matchRules) {
         this.networkCommandsSender = networkCommandsSender;
@@ -127,8 +149,7 @@ public class GameManager implements INetworkGameCommandsHandler {
         networkGameStage1_host_cmd();
     }
 
-
-    // STAGE 1: shows a black card; resupplies white cards; updates the playerStates list;
+    // STAGE 1: server sends a black card; resupplied white cards; an updated playerStates list; a round result; the end game;
     private void networkGameStage1_host_cmd() {
         if (!isHost) {
             Log.d(TAG, "It's host only method!");
@@ -142,11 +163,13 @@ public class GameManager implements INetworkGameCommandsHandler {
         networkCommandsSender.sendNetworkGameCommand(NetworkGameCommand.gameStage1, jsonData, NetworkGameCommandDirection.toClients);
     }
 
+    // STAGE 1: client shows a black card; white cards; players states; a round result; the end game;
+    // calls stage2 (or finishes the game)
     private void networkGameStage1_client_handler(JsonGameStage1Data jsonGameStage1Data) {
-        gameUIUpdater.makeStage1Updates(jsonGameStage1Data);
+        gameUIUpdater.makeStage1Updates(jsonGameStage1Data, clientStageCallback);
     }
 
-    // STAGE 2: playerStates sends back selected white cards; host handles this;
+    // STAGE 2: client sends back selected white cards;
     private void networkGameStage2_client_cmd(JsonGameStage2Data data) {
         String jsonData = new Gson().toJson(data, JsonGameStage1Data.class);
 
@@ -156,11 +179,13 @@ public class GameManager implements INetworkGameCommandsHandler {
             networkCommandsSender.sendNetworkGameCommand(NetworkGameCommand.gameStage2, jsonData, NetworkGameCommandDirection.toHost);
     }
 
+    // STAGE 2: server receives and handles selected white cards
+    // calls stage3
     private void networkGameStage2_host_handler(JsonGameStage2Data jsonGameStage2Data) {
-        gameUIUpdater.makeStage2Updates(jsonGameStage2Data, stageCallback);
+        GameManagerHelper.handleStage2Data(this, jsonGameStage2Data, hostStageCallback);
     }
 
-    // STAGE 3: playerStates see chosen white cards;
+    // STAGE 3: server sends chosen white cards;
     private void networkGameStage3_host_cmd() {
         if (!isHost) {
             Log.d(TAG, "It's host only method!");
@@ -174,11 +199,13 @@ public class GameManager implements INetworkGameCommandsHandler {
         networkCommandsSender.sendNetworkGameCommand(NetworkGameCommand.gameStage3, jsonData, NetworkGameCommandDirection.toClients);
     }
 
+    // STAGE 3: client shows chosen white cards; the king selects round winner cards
+    // calls stage 4
     private void networkGameStage3_client_handler(JsonGameStage3Data jsonGameStage3Data) {
-        gameUIUpdater.makeStage3Updates(jsonGameStage3Data);
+        gameUIUpdater.makeStage3Updates(jsonGameStage3Data, clientStageCallback);
     }
 
-    // STAGE 4: the king selects a round winner;
+    // STAGE 4: client sends selected round winner cards;
     private void networkGameStage4_client_cmd(JsonGameStage4Data data) {
         String jsonData = new Gson().toJson(data, JsonGameStage1Data.class);
 
@@ -188,8 +215,14 @@ public class GameManager implements INetworkGameCommandsHandler {
             networkCommandsSender.sendNetworkGameCommand(NetworkGameCommand.gameStage4, jsonData, NetworkGameCommandDirection.toHost);
     }
 
+    // STAGE 4: server receives and handles round winner cards;
+    // calls stage 1 (or end game)
     private void networkGameStage4_host_handler(JsonGameStage4Data jsonGameStage4Data) {
-        gameUIUpdater.makeStage4Updates(jsonGameStage4Data, stageCallback);
+        GameManagerHelper.handleStage4Data(this, jsonGameStage4Data, hostStageCallback);
+    }
+
+    private void endGame() {
+
     }
 
     @Override
@@ -224,5 +257,32 @@ public class GameManager implements INetworkGameCommandsHandler {
 
     public List<PlayerState> getPlayersStates() {
         return this.playersStates;
+    }
+
+    public List<JsonWhiteCardsSelection> getCurrentWhiteCardsSelections() {
+        return this.currentWhiteCardsSelections;
+    }
+
+    public MatchRules getMatchRules() {
+        return this.matchRules;
+    }
+
+    public JsonCard getCurrentBlackCard() {
+        return this.currentBlackCard;
+    }
+
+    public void setCurrentBlackCard(JsonCard currentBlackCard) {
+        this.currentBlackCard = currentBlackCard;
+    }
+
+    public JsonRoundResult getRoundResult() {
+        if (this.roundResult == null)
+            return new JsonRoundResult();
+
+        return this.roundResult;
+    }
+
+    public void setRoundResult(JsonRoundResult roundResult) {
+        this.roundResult = roundResult;
     }
 }
