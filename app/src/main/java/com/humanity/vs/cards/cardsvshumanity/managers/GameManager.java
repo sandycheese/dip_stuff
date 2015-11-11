@@ -33,19 +33,18 @@ import java.util.List;
  */
 // todo null & empty checks everywhere? is it worth it?
 // todo add errors texts
-// todo game will absolutely not cheat-protected (code simplicity over complexity. i don't like a mind blowing when i read a code)
+// todo a non-authoritative architecture. too many time for implementation. and there is no reasons to secure the game
 public class GameManager implements INetworkGameCommandsHandler {
 
     private static final String TAG = "ddd";
 
-    private List<PlayerState> playerStates;
+    private List<PlayerState> playersStates;
     private List<Card> cards;
     private List<Card> unusedCards;
     private MatchRules matchRules;
     private INetworkGameCommandsSender networkCommandsSender;
     private IGameUIUpdater gameUIUpdater;
     private boolean isHost;
-    private List<PlayerState> playersStates;
     private List<JsonWhiteCardsSelection> currentWhiteCardsSelections = new ArrayList<>();
 
     private IClientStageCallback clientStageCallback = new IClientStageCallback() {
@@ -61,7 +60,7 @@ public class GameManager implements INetworkGameCommandsHandler {
 
         @Override
         public void endGame() {
-            endGame();
+            GameManager.this.endGame();
         }
     };
     private IHostStageCallback hostStageCallback = new IHostStageCallback() {
@@ -75,16 +74,17 @@ public class GameManager implements INetworkGameCommandsHandler {
             networkGameStage3_host_cmd();
         }
     };
+
     private JsonCard currentBlackCard;
     private JsonRoundResult roundResult;
 
-    public void newGameAsHost(INetworkGameCommandsSender networkGameCommandsSender, IGameUIUpdater gameUIUpdater, List<GameClient> gameClients, List<Card> cards, MatchRules matchRules) {
-        this.networkCommandsSender = networkCommandsSender;
+    public void newGameAsHost(INetworkGameCommandsSender commandsSender, IGameUIUpdater gameUIUpdater, List<GameClient> gameClients, List<Card> allCards, MatchRules matchRules) {
+        this.networkCommandsSender = commandsSender;
         this.gameUIUpdater = gameUIUpdater;
 
         this.isHost = false;
 
-        this.cards = cards;
+        this.cards = allCards;
         this.unusedCards = new ArrayList<>(cards);
         this.matchRules = matchRules;
 
@@ -98,8 +98,8 @@ public class GameManager implements INetworkGameCommandsHandler {
         startGameReactiveLoop();
     }
 
-    public void newGameAsClient(INetworkGameCommandsSender networkGameCommandsSender, IGameUIUpdater gameUIUpdater) {
-        this.networkCommandsSender = networkCommandsSender;
+    public void newGameAsClient(INetworkGameCommandsSender commandsSender, IGameUIUpdater gameUIUpdater) {
+        this.networkCommandsSender = commandsSender;
         this.gameUIUpdater = gameUIUpdater;
 
         this.isHost = false;
@@ -116,23 +116,23 @@ public class GameManager implements INetworkGameCommandsHandler {
     }
 
     private void initPlayersGameStates(List<GameClient> gameClients) {
-        this.playerStates = new ArrayList<>();
+        this.playersStates = new ArrayList<>();
 
         // create players states list
         for (GameClient gameClient : gameClients) {
-            this.playerStates.add(new PlayerState(gameClient.getId(), gameClient.getNickname()));
+            this.playersStates.add(new PlayerState(gameClient.getId(), gameClient.getNickname()));
         }
 
         // define players order
         ArrayList<Integer> orderNumbers = new ArrayList<>();
-        for (int i = 0; i < playerStates.size(); i++) {
+        for (int i = 0; i < playersStates.size(); i++) {
             orderNumbers.add(i);
         }
 
         Collections.shuffle(orderNumbers);
 
-        for (int i = 0; i < playerStates.size(); i++) {
-            playerStates.get(i).order = orderNumbers.get(i);
+        for (int i = 0; i < playersStates.size(); i++) {
+            playersStates.get(i).order = orderNumbers.get(i);
         }
 
         // set score 0
@@ -149,7 +149,7 @@ public class GameManager implements INetworkGameCommandsHandler {
         networkGameStage1_host_cmd();
     }
 
-    // STAGE 1: server sends a black card; resupplied white cards; an updated playerStates list; a round result; the end game;
+    // STAGE 1: server sends a black card; resupplied white cards; an updated playersStates list; a round result; the end game;
     private void networkGameStage1_host_cmd() {
         if (!isHost) {
             Log.d(TAG, "It's host only method!");
@@ -222,7 +222,7 @@ public class GameManager implements INetworkGameCommandsHandler {
     }
 
     private void endGame() {
-
+        networkCommandsSender.endGame();
     }
 
     @Override
