@@ -15,6 +15,7 @@ import com.humanity.vs.cards.cardsvshumanity.entities_json.JsonMatchRules;
 import com.humanity.vs.cards.cardsvshumanity.entities_json.JsonPlayerState;
 import com.humanity.vs.cards.cardsvshumanity.entities_json.JsonPlayersWhiteDeck;
 import com.humanity.vs.cards.cardsvshumanity.entities_json.JsonRoundResult;
+import com.humanity.vs.cards.cardsvshumanity.entities_json.JsonRoundWinnerSelection;
 import com.humanity.vs.cards.cardsvshumanity.entities_json.JsonWhiteCardsSelection;
 import com.humanity.vs.cards.cardsvshumanity.interfaces.IHostStageCallback;
 import com.humanity.vs.cards.cardsvshumanity.managers.GameManager;
@@ -94,14 +95,18 @@ public class GameManagerHelper {
         }
 
         JsonPlayersWhiteDeck[] jsonPlayersWhiteDecks = new JsonPlayersWhiteDeck[playersStates.size()];
-        for (PlayerState p : playersStates) {
+        for (int i = 0; i < playersStates.size(); i++) {
+            PlayerState p = playersStates.get(i);
+
             JsonPlayersWhiteDeck jsonPlayersWhiteDeck = new JsonPlayersWhiteDeck();
+            jsonPlayersWhiteDeck.playerId = p.id;
             jsonPlayersWhiteDeck.whiteCards = new JsonCard[PLAYER_CARDS_COUNT];
 
-            for (int i = 0; i < jsonPlayersWhiteDeck.whiteCards.length; i++) {
-                jsonPlayersWhiteDeck.whiteCards[i] = new JsonCard(p.cards.get(i));
+            for (int j = 0; j < jsonPlayersWhiteDeck.whiteCards.length; j++) {
+                jsonPlayersWhiteDeck.whiteCards[j] = new JsonCard(p.cards.get(j));
             }
 
+            jsonPlayersWhiteDecks[i] = jsonPlayersWhiteDeck;
         }
 
         data.playersWhiteDecks = jsonPlayersWhiteDecks;
@@ -146,8 +151,24 @@ public class GameManagerHelper {
         // adding a player selection
         currentSelections.add(jsonGameStage2Data.whiteCardsSelection);
 
+        // remove selected cards from player deck
+        for (PlayerState p : playerStates) {
+            if (p.id.equals(jsonGameStage2Data.whiteCardsSelection.playerId)) {
+                for (int i = 0; i < jsonGameStage2Data.whiteCardsSelection.selectedWhiteCards.length; i++) {
+                    int selectedCardId = jsonGameStage2Data.whiteCardsSelection.selectedWhiteCards[i].id;
+
+                    for (Card c : p.cards) {
+                        if (c.id == selectedCardId) {
+                            p.cards.remove(c);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
         // call a next stage if all done
-        if (currentSelections.size() == playerStates.size()) {
+        if (currentSelections.size() == playerStates.size() - 1) {
             hostStageCallback.stage3_cmd();
         }
     }
@@ -176,6 +197,28 @@ public class GameManagerHelper {
         for (PlayerState p : playerStates) {
             if (p.id.equals(winnerId)) {
                 p.score++;
+                break;
+            }
+        }
+
+        // set next king // goddamn. i want LINQ!
+        int nextKingOrder = -1;
+        for (PlayerState p : playerStates) {
+            if (p.isKing) {
+                p.isKing = false;
+
+                nextKingOrder = p.order + 1;
+                if (nextKingOrder >= playerStates.size())
+                    nextKingOrder = 0;
+
+                break;
+            }
+        }
+
+        for (PlayerState p : playerStates) {
+            if (p.order == nextKingOrder) {
+                p.isKing = true;
+
                 break;
             }
         }

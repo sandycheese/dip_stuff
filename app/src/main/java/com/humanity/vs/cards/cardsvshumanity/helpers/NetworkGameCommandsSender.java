@@ -12,4 +12,14 @@ public class NetworkGameCommandsSender implements INetworkGameCommandsSender {
     public void sendNetworkGameCommand(NetworkGameCommand networkGameCommand, String jsonData, NetworkGameCommandDirection direction) {
 
     }
+
+    @Override
+    public String getClientNetworkId() {
+        return null;
+    }
+
+    @Override
+    public void endGame() {
+
+    }
 }

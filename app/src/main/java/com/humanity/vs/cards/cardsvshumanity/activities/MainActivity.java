@@ -1,9 +1,9 @@
 package com.humanity.vs.cards.cardsvshumanity.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -15,10 +15,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.humanity.vs.cards.cardsvshumanity.R;
-import com.humanity.vs.cards.cardsvshumanity.entities.Card;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -47,6 +43,13 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        test();
+    }
+
+    private void test() {
+        Intent i = new Intent(this, TestsActivity.class);
+        startActivity(i);
     }
 
     @Override

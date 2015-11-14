@@ -3,6 +3,7 @@ package com.humanity.vs.cards.cardsvshumanity.managers;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.humanity.vs.cards.cardsvshumanity.App;
 import com.humanity.vs.cards.cardsvshumanity.entities.Card;
 import com.humanity.vs.cards.cardsvshumanity.entities.MatchRules;
 import com.humanity.vs.cards.cardsvshumanity.entities.GameClient;
@@ -35,8 +36,6 @@ import java.util.List;
 // todo add errors texts
 // todo a non-authoritative architecture. too many time for implementation. and there is no reasons to secure the game
 public class GameManager implements INetworkGameCommandsHandler {
-
-    private static final String TAG = "ddd";
 
     private List<PlayerState> playersStates;
     private List<Card> cards;
@@ -79,10 +78,12 @@ public class GameManager implements INetworkGameCommandsHandler {
     private JsonRoundResult roundResult;
 
     public void newGameAsHost(INetworkGameCommandsSender commandsSender, IGameUIUpdater gameUIUpdater, List<GameClient> gameClients, List<Card> allCards, MatchRules matchRules) {
+        Log.d(App.TAG, "newGameAsHost");
+
         this.networkCommandsSender = commandsSender;
         this.gameUIUpdater = gameUIUpdater;
 
-        this.isHost = false;
+        this.isHost = true;
 
         this.cards = allCards;
         this.unusedCards = new ArrayList<>(cards);
@@ -99,6 +100,8 @@ public class GameManager implements INetworkGameCommandsHandler {
     }
 
     public void newGameAsClient(INetworkGameCommandsSender commandsSender, IGameUIUpdater gameUIUpdater) {
+        Log.d(App.TAG, "newGameAsClient");
+
         this.networkCommandsSender = commandsSender;
         this.gameUIUpdater = gameUIUpdater;
 
@@ -106,6 +109,8 @@ public class GameManager implements INetworkGameCommandsHandler {
     }
 
     private boolean isGameDataOk(List<GameClient> gameClients, List<Card> cards, MatchRules matchRules) {
+        Log.d(App.TAG, "isGameDataOk");
+
         if (EmptyUtils.isEmpty(gameClients) || EmptyUtils.isEmpty(cards))
             return false;
 
@@ -116,6 +121,8 @@ public class GameManager implements INetworkGameCommandsHandler {
     }
 
     private void initPlayersGameStates(List<GameClient> gameClients) {
+        Log.d(App.TAG, "initPlayersGameStates");
+
         this.playersStates = new ArrayList<>();
 
         // create players states list
@@ -146,13 +153,17 @@ public class GameManager implements INetworkGameCommandsHandler {
     }
 
     private void startGameReactiveLoop() {
+        Log.d(App.TAG, "startGameReactiveLoop");
+
         networkGameStage1_host_cmd();
     }
 
     // STAGE 1: server sends a black card; resupplied white cards; an updated playersStates list; a round result; the end game;
     private void networkGameStage1_host_cmd() {
+        Log.d(App.TAG, "networkGameStage1_host_cmd");
+
         if (!isHost) {
-            Log.d(TAG, "It's host only method!");
+            Log.d(App.TAG, "It's host only method!");
             return;
         }
 
@@ -166,12 +177,16 @@ public class GameManager implements INetworkGameCommandsHandler {
     // STAGE 1: client shows a black card; white cards; players states; a round result; the end game;
     // calls stage2 (or finishes the game)
     private void networkGameStage1_client_handler(JsonGameStage1Data jsonGameStage1Data) {
-        gameUIUpdater.makeStage1Updates(jsonGameStage1Data, clientStageCallback);
+        Log.d(App.TAG, "networkGameStage1_client_handler");
+
+        gameUIUpdater.makeStage1Updates(jsonGameStage1Data, clientStageCallback, networkCommandsSender.getClientNetworkId());
     }
 
     // STAGE 2: client sends back selected white cards;
     private void networkGameStage2_client_cmd(JsonGameStage2Data data) {
-        String jsonData = new Gson().toJson(data, JsonGameStage1Data.class);
+        Log.d(App.TAG, "networkGameStage2_client_cmd");
+
+        String jsonData = new Gson().toJson(data, JsonGameStage2Data.class);
 
         if (isHost)
             networkGameStage2_host_handler(data);
@@ -182,18 +197,22 @@ public class GameManager implements INetworkGameCommandsHandler {
     // STAGE 2: server receives and handles selected white cards
     // calls stage3
     private void networkGameStage2_host_handler(JsonGameStage2Data jsonGameStage2Data) {
+        Log.d(App.TAG, "networkGameStage2_host_handler");
+
         GameManagerHelper.handleStage2Data(this, jsonGameStage2Data, hostStageCallback);
     }
 
     // STAGE 3: server sends chosen white cards;
     private void networkGameStage3_host_cmd() {
+        Log.d(App.TAG, "networkGameStage3_host_cmd");
+
         if (!isHost) {
-            Log.d(TAG, "It's host only method!");
+            Log.d(App.TAG, "It's host only method!");
             return;
         }
 
         JsonGameStage3Data data = GameManagerHelper.getStage3Data(this);
-        String jsonData = new Gson().toJson(data, JsonGameStage1Data.class);
+        String jsonData = new Gson().toJson(data, JsonGameStage3Data.class);
 
         networkGameStage3_client_handler(data);
         networkCommandsSender.sendNetworkGameCommand(NetworkGameCommand.gameStage3, jsonData, NetworkGameCommandDirection.toClients);
@@ -202,12 +221,16 @@ public class GameManager implements INetworkGameCommandsHandler {
     // STAGE 3: client shows chosen white cards; the king selects round winner cards
     // calls stage 4
     private void networkGameStage3_client_handler(JsonGameStage3Data jsonGameStage3Data) {
-        gameUIUpdater.makeStage3Updates(jsonGameStage3Data, clientStageCallback);
+        Log.d(App.TAG, "networkGameStage3_client_handler");
+
+        gameUIUpdater.makeStage3Updates(jsonGameStage3Data, clientStageCallback, networkCommandsSender.getClientNetworkId());
     }
 
     // STAGE 4: client sends selected round winner cards;
     private void networkGameStage4_client_cmd(JsonGameStage4Data data) {
-        String jsonData = new Gson().toJson(data, JsonGameStage1Data.class);
+        Log.d(App.TAG, "networkGameStage4_client_cmd");
+
+        String jsonData = new Gson().toJson(data, JsonGameStage4Data.class);
 
         if (isHost)
             networkGameStage4_host_handler(data);
@@ -218,15 +241,21 @@ public class GameManager implements INetworkGameCommandsHandler {
     // STAGE 4: server receives and handles round winner cards;
     // calls stage 1 (or end game)
     private void networkGameStage4_host_handler(JsonGameStage4Data jsonGameStage4Data) {
+        Log.d(App.TAG, "networkGameStage4_host_handler");
+
         GameManagerHelper.handleStage4Data(this, jsonGameStage4Data, hostStageCallback);
     }
 
     private void endGame() {
+        Log.d(App.TAG, "endGame");
+
         networkCommandsSender.endGame();
     }
 
     @Override
     public void handleNetworkGameCommand(NetworkGameCommand networkGameCommand, String jsonData) {
+        Log.d(App.TAG, "handleNetworkGameCommand:" + networkGameCommand);
+
         switch (networkGameCommand) {
             case gameStage1:
                 JsonGameStage1Data jsonGameStage1Data = GameManagerHelper.getStage1DataFromJson(jsonData);
