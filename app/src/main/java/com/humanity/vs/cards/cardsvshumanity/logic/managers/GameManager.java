@@ -35,6 +35,7 @@ import java.util.List;
 // todo null & empty checks everywhere? is it worth it?
 // todo add errors texts
 // todo add UI error callbacks
+// todo action button is crazy! (render problems)
 // todo a non-authoritative architecture. too many time for implementation. and there is no reasons to secure the game
 public class GameManager implements INetworkGameCommandsHandler {
 

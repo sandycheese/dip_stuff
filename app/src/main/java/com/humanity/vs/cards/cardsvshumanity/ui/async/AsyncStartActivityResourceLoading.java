@@ -40,6 +40,6 @@ public class AsyncStartActivityResourceLoading extends AsyncTask<Void, Integer, 
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
 
-        activity.loadMainActivity();
+        activity.checkedMainActivityStart();
     }
 }

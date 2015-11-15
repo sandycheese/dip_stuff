@@ -16,6 +16,10 @@ import com.humanity.vs.cards.cardsvshumanity.utils.WiFiDirectChecker;
  */
 public class StartActivity extends Activity {
 
+    // fixme turn off debug triggers when done
+    boolean enableWiDiCheck = false;
+    boolean enableCardsLoading = false;
+
     ProgressBar progressBar;
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,7 +27,10 @@ public class StartActivity extends Activity {
         setContentView(R.layout.activity_start);
 
         findComponents();
-        loadResources();
+        if (enableCardsLoading)
+            loadResources();
+        else
+            checkedMainActivityStart();
     }
 
     void findComponents() {
@@ -39,9 +46,9 @@ public class StartActivity extends Activity {
             progressBar.setProgress(progress);
     }
 
-    public void loadMainActivity() {
+    public void checkedMainActivityStart() {
 
-        if (!WiFiDirectChecker.isWifiDirectSupported(this)) {
+        if (enableWiDiCheck && !WiFiDirectChecker.isWifiDirectSupported(this)) {
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle(getString(R.string.text_sorry));
