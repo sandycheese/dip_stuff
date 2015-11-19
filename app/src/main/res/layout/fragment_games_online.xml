@@ -6,10 +6,9 @@
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rvHosts"
+        style="@style/RecycleViewFix"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingBottom="@dimen/recycle_view_padding_bottom"
-        android:paddingTop="@dimen/recycle_view_padding_top" />
+        android:layout_height="match_parent" />
 
 
     <android.support.design.widget.FloatingActionButton

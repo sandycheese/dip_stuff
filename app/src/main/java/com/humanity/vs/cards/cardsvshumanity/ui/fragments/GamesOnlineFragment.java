@@ -1,7 +1,10 @@
 package com.humanity.vs.cards.cardsvshumanity.ui.fragments;
 
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Fragment;
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.LinearLayoutManager;
@@ -13,7 +16,14 @@ import android.view.ViewGroup;
 import com.humanity.vs.cards.cardsvshumanity.R;
 import com.humanity.vs.cards.cardsvshumanity.ui.adapters.HostsAdapter;
 import com.humanity.vs.cards.cardsvshumanity.ui.entities.Host;
+import com.humanity.vs.cards.cardsvshumanity.ui.interfaces.INetworkManagerProvider;
+import com.humanity.vs.cards.cardsvshumanity.ui.network.NetworkManager;
+import com.humanity.vs.cards.cardsvshumanity.utils.ErrorsHelper;
+import com.humanity.vs.cards.cardsvshumanity.utils.FragmentsHelper;
+import com.peak.salut.Callbacks.SalutCallback;
+import com.peak.salut.SalutDevice;
 
+import java.sql.Time;
 import java.util.ArrayList;
 
 /**
@@ -23,17 +33,36 @@ import java.util.ArrayList;
 // todo make possible set points to win
 public class GamesOnlineFragment extends Fragment {
 
+    NetworkManager networkManager;
+
     FloatingActionButton fabCreateGame;
     FloatingActionButton fabUpdateHostsList;
     RecyclerView rvHosts;
+
+    AlertDialog pdHostUpdating;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_games_online, container, false);
 
+        getActivity().setTitle(getActivity().getString(R.string.title_available_hosts));
+
         initComponents(view);
+        initNetworkHostsListener();
+        setButtonsListeners();
 
         return view;
+    }
+
+    private void initNetworkHostsListener() {
+        Activity a = getActivity();
+
+        if (a instanceof INetworkManagerProvider) {
+            networkManager = ((INetworkManagerProvider) a).getNetworkManager();
+        } else {
+            ErrorsHelper.commonError(a);
+            FragmentsHelper.setFragment(a, R.id.rlContainer, new GamesOnlineFragment());
+        }
     }
 
     void initComponents(View v) {
@@ -43,6 +72,69 @@ public class GamesOnlineFragment extends Fragment {
         rvHosts = (RecyclerView) v.findViewById(R.id.rvHosts);
         rvHosts.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        rvHosts.setAdapter(new HostsAdapter(new ArrayList<Host>()));
+        pdHostUpdating = new ProgressDialog(getActivity());
+
+        pdHostUpdating.setTitle(R.string.msg_updating_host_list);
+        pdHostUpdating.setMessage(getString(R.string.text_please_wait));
     }
+
+    private void setButtonsListeners() {
+        fabCreateGame.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Bundle bundle = new Bundle();
+                bundle.putBoolean(GameLobbyFragment.ARG_START_AS_HOST, true);
+
+                GameLobbyFragment gameLobbyFragment = new GameLobbyFragment();
+                gameLobbyFragment.setArguments(bundle);
+
+                FragmentsHelper.setFragment(getActivity(), R.id.rlContainer, gameLobbyFragment);
+            }
+        });
+        fabUpdateHostsList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pdHostUpdating.show();
+                networkManager.discoverHosts(onDiscoverHostsDoneHandler);
+            }
+        });
+    }
+
+    private SalutCallback onDiscoverHostsDoneHandler = new SalutCallback() {
+        @Override
+        public void call() {
+            pdHostUpdating.dismiss();
+
+            ArrayList<SalutDevice> devices = networkManager.getAllHosts();
+
+            ArrayList<Host> hosts = new ArrayList<>();
+            for (SalutDevice device : devices) {
+                Host host = new Host();
+                host.hostName = device.readableName;
+                host.deviceName = device.deviceName;
+                host.salutDevice = device;
+
+                hosts.add(host);
+            }
+
+            rvHosts.setAdapter(new HostsAdapter(hosts, networkManager, new SalutCallback() {
+                @Override
+                public void call() {
+                    FragmentsHelper.setFragment(getActivity(), R.id.rlContainer, new GameLobbyFragment());
+                }
+            }, new SalutCallback() {
+                @Override
+                public void call() {
+                    // fixme exception here if afk
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setCancelable(false);
+                    builder.setTitle(R.string.dialog_title_connecting_to_host);
+                    builder.setMessage(R.string.msg_cant_connect_to_host);
+                    builder.setPositiveButton(R.string.text_ok, null);
+                    builder.show();
+                }
+            }));
+        }
+    };
 }

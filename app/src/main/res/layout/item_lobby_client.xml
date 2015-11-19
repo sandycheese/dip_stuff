@@ -2,10 +2,11 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <android.support.v7.widget.CardView
-        android:id="@+id/cvHost"
+        android:id="@+id/cvLobbyClient"
         style="@style/CardViewFix"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -17,23 +18,12 @@
             android:padding="@dimen/card_padding">
 
             <TextView
-                android:id="@+id/tvDeviceName"
+                android:id="@+id/tvLobbyClientName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
-                android:text="Created 12:58"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
-
-            <TextView
-                android:id="@+id/tvHostShortInfo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_below="@+id/tvDeviceName"
-                android:text="LG Leon (3 players)"
+                android:text="LG Leon "
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
         </RelativeLayout>

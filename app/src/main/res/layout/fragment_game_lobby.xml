@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rvLobbyClients"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/btnStartGame"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:paddingBottom="@dimen/recycle_view_padding_bottom"
+        android:paddingTop="@dimen/recycle_view_padding_top"
+        android:layout_alignTop="@+id/btnStartGame" />
+
+    <View
+        android:id="@+id/dividerForStartGameButton"
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:layout_alignBottom="@+id/rvLobbyClients"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:background="?android:attr/listDivider" />
+
+    <Button
+        android:id="@+id/btnStartGame"
+        style="@style/Base.Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center_horizontal"
+        android:text="Start game" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Test send"
+        android:id="@+id/btnTestSend"
+        android:layout_alignBottom="@+id/rvLobbyClients"
+        android:layout_alignRight="@+id/btnStartGame"
+        android:layout_alignEnd="@+id/btnStartGame" />
+
+</RelativeLayout>

@@ -9,6 +9,8 @@ import android.widget.TextView;
 
 import com.humanity.vs.cards.cardsvshumanity.R;
 import com.humanity.vs.cards.cardsvshumanity.ui.entities.Host;
+import com.humanity.vs.cards.cardsvshumanity.ui.network.NetworkManager;
+import com.peak.salut.Callbacks.SalutCallback;
 
 import java.util.List;
 
@@ -17,10 +19,19 @@ import java.util.List;
  */
 public class HostsAdapter extends RecyclerView.Adapter<HostsAdapter.HostsViewHolder> {
 
-    List<Host> items;
+    private List<Host> items;
+    private NetworkManager networkManager;
+    private SalutCallback registerSuccessCallback;
+    private SalutCallback registerFailCallback;
 
-    public HostsAdapter(List<Host> hosts) {
+    public HostsAdapter(List<Host> hosts,
+                        NetworkManager networkManager,
+                        SalutCallback registerSuccessCallback,
+                        SalutCallback registerFailCallback) {
         this.items = hosts;
+        this.networkManager = networkManager;
+        this.registerSuccessCallback = registerSuccessCallback;
+        this.registerFailCallback = registerFailCallback;
     }
 
     @Override
@@ -37,24 +48,29 @@ public class HostsAdapter extends RecyclerView.Adapter<HostsAdapter.HostsViewHol
 
     @Override
     public void onBindViewHolder(HostsViewHolder holder, int position) {
-        Host item = items.get(position);
+        final Host item = items.get(position);
 
-        // todo make short time string
-        holder.tvCreatedDate.setText(String.format("Created %s", item.createdTime.toString()));
+        holder.tvDeviceName.setText(item.deviceName);
         holder.tvHostShortInfo.setText(String.format("%s", item.hostName));
+        holder.cvHost.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                networkManager.registerWithHost(item.salutDevice, registerSuccessCallback, registerFailCallback);
+            }
+        });
     }
 
     public class HostsViewHolder extends RecyclerView.ViewHolder {
 
         CardView cvHost;
-        TextView tvCreatedDate;
+        TextView tvDeviceName;
         TextView tvHostShortInfo;
 
         public HostsViewHolder(View itemView) {
             super(itemView);
 
             cvHost = (CardView) itemView.findViewById(R.id.cvHost);
-            tvCreatedDate = (TextView) itemView.findViewById(R.id.tvCreateDate);
+            tvDeviceName = (TextView) itemView.findViewById(R.id.tvDeviceName);
             tvHostShortInfo = (TextView) itemView.findViewById(R.id.tvHostShortInfo);
         }
     }

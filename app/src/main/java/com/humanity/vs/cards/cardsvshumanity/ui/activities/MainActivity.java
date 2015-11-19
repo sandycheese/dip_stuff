@@ -7,15 +7,28 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.humanity.vs.cards.cardsvshumanity.R;
 import com.humanity.vs.cards.cardsvshumanity.ui.fragments.GamesOnlineFragment;
+import com.humanity.vs.cards.cardsvshumanity.ui.interfaces.INetworkManagerProvider;
+import com.humanity.vs.cards.cardsvshumanity.ui.network.MySalutDataCallback;
+import com.humanity.vs.cards.cardsvshumanity.ui.network.NetworkManager;
 import com.humanity.vs.cards.cardsvshumanity.utils.FragmentsHelper;
+import com.peak.salut.Callbacks.SalutCallback;
+import com.peak.salut.Salut;
+import com.peak.salut.SalutDataReceiver;
+import com.peak.salut.SalutServiceData;
 
+// todo create empty views for recycle view
+// todo add wi-fi enabled check
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, INetworkManagerProvider {
+
+    NetworkManager networkManager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +47,13 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        initNetwork();
         initFirstFragment();
+    }
+
+    private void initNetwork() {
+        networkManager = new NetworkManager(this);
+        networkManager.initNetworkService();
     }
 
     private void initFirstFragment() {
@@ -96,5 +115,10 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public NetworkManager getNetworkManager() {
+        return this.networkManager;
     }
 }

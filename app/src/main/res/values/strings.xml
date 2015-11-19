@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">CardsVsHumanity</string>
+    <string name="game_network_service_name">cardsvshumanitygame</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -9,4 +10,14 @@
     <string name="text_sorry">Sorry</string>
     <string name="text_ok">OK</string>
     <string name="msg_widi_unsupported_device">Your device doesn\'t support Wi-Fi Direct</string>
+    <string name="error_message_app_error">Application is broken</string>
+    <string name="msg_unable_create_host">Unable to create a host</string>
+    <string name="dialog_title_connecting_to_host">Connecting to host</string>
+    <string name="msg_cant_connect_to_host">Can\'t connect to host</string>
+    <string name="title_available_hosts">Available hosts</string>
+    <string name="title_game_lobby">Game lobby</string>
+    <string name="text_host">Host</string>
+    <string name="text_client">Client</string>
+    <string name="text_please_wait">Please wait</string>
+    <string name="msg_updating_host_list">Updating hosts list</string>
 </resources>

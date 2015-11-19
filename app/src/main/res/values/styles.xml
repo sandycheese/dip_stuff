@@ -7,11 +7,27 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
+
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
+
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+
+    <!--custom card view-->
+    <style name="CardViewFix">
+        <item name="android:layout_marginLeft">@dimen/card_margin_left</item>
+        <item name="android:layout_marginRight">@dimen/card_margin_right</item>
+    </style>
+
+    <!--custom recycleview-->
+    <style name="RecycleViewFix">
+        <item name="android:paddingBottom">@dimen/recycle_view_padding_bottom</item>
+        <item name="android:paddingTop">@dimen/recycle_view_padding_top</item>
+    </style>
 
 </resources>
