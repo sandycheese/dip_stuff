@@ -31,7 +31,7 @@ import java.util.Arrays;
 /**
  * Created by robot on 17.11.15.
  */
-// todo make hint about wi-fi problem
+// todo make make hint buttons on alert dialogs (wi-fi vs wi-fi direct; diff versions of application)
 // todo make kick function?
 public class GameLobbyFragment extends Fragment {
 
@@ -131,13 +131,15 @@ public class GameLobbyFragment extends Fragment {
         btnStartGame.setVisibility(startAsHost ? View.VISIBLE : View.GONE);
         btnLeaveGame.setVisibility(startAsHost ? View.GONE : View.VISIBLE);
 
-        ArrayList<JsonPlayerInLobby> jsonPlayersInLobby = new ArrayList<>();
-        JsonPlayerInLobby pseudoPlayer = new JsonPlayerInLobby();
-        pseudoPlayer.deviceName = getString(R.string.text_you);
-        pseudoPlayer.readableName = Build.MODEL;
+        if (startAsHost) {
+            ArrayList<JsonPlayerInLobby> jsonPlayersInLobby = new ArrayList<>();
+            JsonPlayerInLobby pseudoPlayer = new JsonPlayerInLobby();
+            pseudoPlayer.deviceName = getString(R.string.text_you);
+            pseudoPlayer.readableName = Build.MODEL;
 
-        jsonPlayersInLobby.add(pseudoPlayer);
-        rvLobbyClients.setAdapter(new LobbyClientsAdapter(jsonPlayersInLobby));
+            jsonPlayersInLobby.add(pseudoPlayer);
+            rvLobbyClients.setAdapter(new LobbyClientsAdapter(jsonPlayersInLobby));
+        }
     }
 
     boolean initNetworkManager() {

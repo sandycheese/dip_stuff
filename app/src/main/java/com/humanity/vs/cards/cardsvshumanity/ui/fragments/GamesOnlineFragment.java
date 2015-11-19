@@ -31,6 +31,7 @@ import java.util.ArrayList;
  */
 // todo create empty view for recycleview
 // todo make possible set points to win
+// todo make connection progress dialog async
 public class GamesOnlineFragment extends Fragment {
 
     NetworkManager networkManager;
@@ -126,7 +127,6 @@ public class GamesOnlineFragment extends Fragment {
         pdConnectingToHost = new ProgressDialog(getActivity());
         pdConnectingToHost.setTitle(R.string.msg_connectingToHost);
         pdConnectingToHost.setMessage(getString(R.string.text_please_wait));
-        pdConnectingToHost.setCancelable(false);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setCancelable(false);

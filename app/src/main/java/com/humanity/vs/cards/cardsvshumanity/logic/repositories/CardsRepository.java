@@ -28,6 +28,7 @@ import java.util.List;
  * Created by robot on 11.11.15.
  */
 // todo errors & nulls
+// todo make parser use a logan square (faster)
 public class CardsRepository {
     // // FIXME: 15.11.15 too long loading time. serialize and save after first parse?
     public static List<Card> getAllCards(Context context, @Nullable RecoverySystem.ProgressListener progressCallback) {

@@ -8,32 +8,32 @@
         android:id="@+id/rvLobbyClients"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_above="@+id/dividerForButtons"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
         android:paddingBottom="@dimen/recycle_view_padding_bottom"
-        android:paddingTop="@dimen/recycle_view_padding_top"
-        android:layout_above="@+id/dividerForButtons"
-        android:layout_alignParentTop="true" />
+        android:paddingTop="@dimen/recycle_view_padding_top" />
 
     <View
         android:id="@+id/dividerForButtons"
         android:layout_width="match_parent"
         android:layout_height="1px"
-        android:background="?android:attr/listDivider"
         android:layout_above="@+id/llButtons"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-
+        android:layout_alignParentStart="true"
+        android:background="?android:attr/listDivider" />
 
 
     <LinearLayout
-        android:orientation="vertical"
+        android:id="@+id/llButtons"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:id="@+id/llButtons">
+        android:orientation="vertical">
+
         <Button
             android:id="@+id/btnStartGame"
             style="@style/Base.Widget.AppCompat.Button.Borderless.Colored"
