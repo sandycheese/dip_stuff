@@ -21,15 +21,17 @@ public class HostsAdapter extends RecyclerView.Adapter<HostsAdapter.HostsViewHol
 
     private List<Host> items;
     private NetworkManager networkManager;
+    private SalutCallback startRegisteringCallback;
     private SalutCallback registerSuccessCallback;
     private SalutCallback registerFailCallback;
 
     public HostsAdapter(List<Host> hosts,
                         NetworkManager networkManager,
-                        SalutCallback registerSuccessCallback,
+                        SalutCallback startRegisteringCallback, SalutCallback registerSuccessCallback,
                         SalutCallback registerFailCallback) {
         this.items = hosts;
         this.networkManager = networkManager;
+        this.startRegisteringCallback = startRegisteringCallback;
         this.registerSuccessCallback = registerSuccessCallback;
         this.registerFailCallback = registerFailCallback;
     }
@@ -55,6 +57,7 @@ public class HostsAdapter extends RecyclerView.Adapter<HostsAdapter.HostsViewHol
         holder.cvHost.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                startRegisteringCallback.call();
                 networkManager.registerWithHost(item.salutDevice, registerSuccessCallback, registerFailCallback);
             }
         });

@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import com.humanity.vs.cards.cardsvshumanity.R;
 import com.humanity.vs.cards.cardsvshumanity.ui.fragments.GamesOnlineFragment;
 import com.humanity.vs.cards.cardsvshumanity.ui.interfaces.INetworkManagerProvider;
+import com.humanity.vs.cards.cardsvshumanity.ui.network.AllNetworkDataHandler;
 import com.humanity.vs.cards.cardsvshumanity.ui.network.MySalutDataCallback;
 import com.humanity.vs.cards.cardsvshumanity.ui.network.NetworkManager;
 import com.humanity.vs.cards.cardsvshumanity.utils.FragmentsHelper;
@@ -28,6 +29,7 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, INetworkManagerProvider {
 
     NetworkManager networkManager;
+    AllNetworkDataHandler allNetworkDataHandler;
 
 
     @Override
@@ -52,7 +54,9 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void initNetwork() {
-        networkManager = new NetworkManager(this);
+        allNetworkDataHandler = new AllNetworkDataHandler(this);
+
+        networkManager = new NetworkManager(this, allNetworkDataHandler);
         networkManager.initNetworkService();
     }
 

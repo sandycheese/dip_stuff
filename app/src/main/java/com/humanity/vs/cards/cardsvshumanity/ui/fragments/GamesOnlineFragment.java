@@ -40,6 +40,53 @@ public class GamesOnlineFragment extends Fragment {
     RecyclerView rvHosts;
 
     AlertDialog pdHostUpdating;
+    AlertDialog pdConnectingToHost;
+    AlertDialog adCantConnectToHost;
+
+    SalutCallback onDiscoverHostsDoneHandler = new SalutCallback() {
+        @Override
+        public void call() {
+            pdHostUpdating.dismiss();
+
+            ArrayList<SalutDevice> devices = networkManager.getAllHosts();
+
+            ArrayList<Host> hosts = new ArrayList<>();
+            for (SalutDevice device : devices) {
+                Host host = new Host();
+                host.hostName = device.readableName;
+                host.deviceName = device.deviceName;
+                host.salutDevice = device;
+
+                hosts.add(host);
+            }
+
+            rvHosts.setAdapter(new HostsAdapter(hosts, networkManager, onStartRegistering, onSuccessfullyRegistered, onFailToRegister));
+        }
+    };
+
+    SalutCallback onStartRegistering = new SalutCallback() {
+        @Override
+        public void call() {
+            pdConnectingToHost.show();
+        }
+    };
+
+    SalutCallback onSuccessfullyRegistered = new SalutCallback() {
+        @Override
+        public void call() {
+            pdConnectingToHost.dismiss();
+            FragmentsHelper.setFragment(getActivity(), R.id.rlContainer, new GameLobbyFragment());
+        }
+    };
+
+    SalutCallback onFailToRegister = new SalutCallback() {
+        @Override
+        public void call() {
+            // fixme exception here if afk
+            pdConnectingToHost.dismiss();
+            adCantConnectToHost.show();
+        }
+    };
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -73,9 +120,20 @@ public class GamesOnlineFragment extends Fragment {
         rvHosts.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         pdHostUpdating = new ProgressDialog(getActivity());
-
         pdHostUpdating.setTitle(R.string.msg_updating_host_list);
         pdHostUpdating.setMessage(getString(R.string.text_please_wait));
+
+        pdConnectingToHost = new ProgressDialog(getActivity());
+        pdConnectingToHost.setTitle(R.string.msg_connectingToHost);
+        pdConnectingToHost.setMessage(getString(R.string.text_please_wait));
+        pdConnectingToHost.setCancelable(false);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setCancelable(false);
+        builder.setTitle(R.string.dialog_title_connecting_to_host);
+        builder.setMessage(R.string.msg_cant_connect_to_host);
+        builder.setPositiveButton(R.string.text_ok, null);
+        adCantConnectToHost = builder.create();
     }
 
     private void setButtonsListeners() {
@@ -100,41 +158,4 @@ public class GamesOnlineFragment extends Fragment {
             }
         });
     }
-
-    private SalutCallback onDiscoverHostsDoneHandler = new SalutCallback() {
-        @Override
-        public void call() {
-            pdHostUpdating.dismiss();
-
-            ArrayList<SalutDevice> devices = networkManager.getAllHosts();
-
-            ArrayList<Host> hosts = new ArrayList<>();
-            for (SalutDevice device : devices) {
-                Host host = new Host();
-                host.hostName = device.readableName;
-                host.deviceName = device.deviceName;
-                host.salutDevice = device;
-
-                hosts.add(host);
-            }
-
-            rvHosts.setAdapter(new HostsAdapter(hosts, networkManager, new SalutCallback() {
-                @Override
-                public void call() {
-                    FragmentsHelper.setFragment(getActivity(), R.id.rlContainer, new GameLobbyFragment());
-                }
-            }, new SalutCallback() {
-                @Override
-                public void call() {
-                    // fixme exception here if afk
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                    builder.setCancelable(false);
-                    builder.setTitle(R.string.dialog_title_connecting_to_host);
-                    builder.setMessage(R.string.msg_cant_connect_to_host);
-                    builder.setPositiveButton(R.string.text_ok, null);
-                    builder.show();
-                }
-            }));
-        }
-    };
 }

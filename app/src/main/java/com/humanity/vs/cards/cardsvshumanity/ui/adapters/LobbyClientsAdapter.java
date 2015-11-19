@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.humanity.vs.cards.cardsvshumanity.R;
-import com.humanity.vs.cards.cardsvshumanity.logic.entities.GameClient;
+import com.humanity.vs.cards.cardsvshumanity.ui.entities_json.JsonPlayerInLobby;
 
 import java.util.List;
 
@@ -16,9 +16,9 @@ import java.util.List;
  * Created by robot on 17.11.15.
  */
 public class LobbyClientsAdapter extends RecyclerView.Adapter<LobbyClientsAdapter.LobbyClientViewHolder> {
-    List<GameClient> items;
+    List<JsonPlayerInLobby> items;
 
-    public LobbyClientsAdapter(List<GameClient> gameClients) {
+    public LobbyClientsAdapter(List<JsonPlayerInLobby> gameClients) {
         this.items = gameClients;
     }
 
@@ -36,9 +36,9 @@ public class LobbyClientsAdapter extends RecyclerView.Adapter<LobbyClientsAdapte
 
     @Override
     public void onBindViewHolder(LobbyClientViewHolder holder, int position) {
-        GameClient item = items.get(position);
+        JsonPlayerInLobby item = items.get(position);
 
-        holder.tvLobbyClientName.setText(String.format("%s", item.getNickname()));
+        holder.tvLobbyClientName.setText(String.format("%s (%s)", item.deviceName, item.readableName));
     }
 
     public class LobbyClientViewHolder extends RecyclerView.ViewHolder {

@@ -8,39 +8,50 @@
         android:id="@+id/rvLobbyClients"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/btnStartGame"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:paddingBottom="@dimen/recycle_view_padding_bottom"
         android:paddingTop="@dimen/recycle_view_padding_top"
-        android:layout_alignTop="@+id/btnStartGame" />
+        android:layout_above="@+id/dividerForButtons"
+        android:layout_alignParentTop="true" />
 
     <View
-        android:id="@+id/dividerForStartGameButton"
+        android:id="@+id/dividerForButtons"
         android:layout_width="match_parent"
         android:layout_height="1px"
-        android:layout_alignBottom="@+id/rvLobbyClients"
+        android:background="?android:attr/listDivider"
+        android:layout_above="@+id/llButtons"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:background="?android:attr/listDivider" />
+        android:layout_alignParentStart="true" />
 
-    <Button
-        android:id="@+id/btnStartGame"
-        style="@style/Base.Widget.AppCompat.Button.Borderless.Colored"
-        android:layout_width="wrap_content"
+
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_gravity="center_horizontal"
-        android:text="Start game" />
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/llButtons">
+        <Button
+            android:id="@+id/btnStartGame"
+            style="@style/Base.Widget.AppCompat.Button.Borderless.Colored"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center_horizontal"
+            android:text="Start game" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Test send"
-        android:id="@+id/btnTestSend"
-        android:layout_alignBottom="@+id/rvLobbyClients"
-        android:layout_alignRight="@+id/btnStartGame"
-        android:layout_alignEnd="@+id/btnStartGame" />
+        <Button
+            android:id="@+id/btnLeaveLobby"
+            style="@style/Base.Widget.AppCompat.Button.Borderless.Colored"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center_horizontal"
+            android:text="Leave" />
+    </LinearLayout>
 
 </RelativeLayout>

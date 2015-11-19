@@ -5,8 +5,8 @@ import android.util.Log;
 
 import com.humanity.vs.cards.cardsvshumanity.App;
 import com.humanity.vs.cards.cardsvshumanity.R;
-import com.humanity.vs.cards.cardsvshumanity.logic.entities.GameClient;
-import com.humanity.vs.cards.cardsvshumanity.ui.entities.JsonPing;
+import com.humanity.vs.cards.cardsvshumanity.ui.entities_json.JsonGodLevelData;
+import com.humanity.vs.cards.cardsvshumanity.ui.entities_json.JsonPlayersInLobby;
 import com.peak.salut.Callbacks.SalutCallback;
 import com.peak.salut.Callbacks.SalutDeviceCallback;
 import com.peak.salut.Salut;
@@ -22,17 +22,21 @@ import java.util.ArrayList;
 public class NetworkManager {
     private final Activity activity;
 
+    private AllNetworkDataHandler allNetworkDataHandler;
+
     private SalutServiceData serviceData;
     private SalutDataReceiver dataReceiver;
     private MySalutDataCallback dataCallback;
     private Salut network;
 
-    public NetworkManager(Activity activity) {
+    public NetworkManager(Activity activity, AllNetworkDataHandler allNetworkDataHandler) {
         this.activity = activity;
+        this.allNetworkDataHandler = allNetworkDataHandler;
     }
 
     public void initNetworkService() {
-        dataCallback = new MySalutDataCallback();
+
+        dataCallback = new MySalutDataCallback(allNetworkDataHandler);
         dataReceiver = new SalutDataReceiver(activity, dataCallback);
 
         int port = activity.getResources().getInteger(R.integer.game_network_service_port);
@@ -103,40 +107,31 @@ public class NetworkManager {
         return network.foundDevices;
     }
 
+    public ArrayList<SalutDevice> getAllDevices() {
+        ArrayList<SalutDevice> devices = new ArrayList<>();
 
-    public ArrayList<SalutDevice> getAllClients() {
-        return network.registeredClients;
+        for (SalutDevice device : network.registeredClients) {
+            if (device != null)
+                devices.add(device);
+        }
+
+        devices.add(network.thisDevice);
+
+        return devices;
     }
 
     public void registerWithHost(SalutDevice salutDevice, SalutCallback onRegisterSuccess, SalutCallback onRegisterFail) {
         network.registerWithHost(salutDevice, onRegisterSuccess, onRegisterFail);
     }
 
-    public void updateLobbyForClients(ArrayList<GameClient> clients) {
-        JsonPing jsonPing = new JsonPing();
-        jsonPing.pingText = "ping";
-        network.sendToAllDevices(jsonPing, new SalutCallback() {
+    public void updateLobbyForClients() {
+        JsonGodLevelData jsonData = JsonPlayersInLobby.getJsonGodLevelData(getAllDevices());
+
+        network.sendToAllDevices(jsonData, new SalutCallback() {
             @Override
             public void call() {
                 Log.d(App.TAG, "Can't send data.");
             }
         });
-    }
-
-    public void sendPingToFirstDevice() {
-        Log.d(App.TAG, "Trying to send ping");
-        ArrayList<SalutDevice> registeredClients = network.registeredClients;
-        if (registeredClients.size() > 0) {
-            JsonPing jsonPing = new JsonPing();
-            jsonPing.pingText = "ping";
-            network.sendToDevice(registeredClients.get(0), jsonPing, new SalutCallback() {
-                @Override
-                public void call() {
-                    Log.d(App.TAG, "Can't send data (ping) to device.");
-                }
-            });
-        } else {
-            Log.d(App.TAG, "There is no devices to send ping.");
-        }
     }
 }

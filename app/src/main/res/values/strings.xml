@@ -20,4 +20,7 @@
     <string name="text_client">Client</string>
     <string name="text_please_wait">Please wait</string>
     <string name="msg_updating_host_list">Updating hosts list</string>
+    <string name="text_ping">ping</string>
+    <string name="msg_connectingToHost">Connecting to host</string>
+    <string name="text_you">You</string>
 </resources>
