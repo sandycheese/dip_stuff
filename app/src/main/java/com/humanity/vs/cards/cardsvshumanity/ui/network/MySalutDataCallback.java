@@ -4,23 +4,29 @@ import android.util.Log;
 
 import com.bluelinelabs.logansquare.LoganSquare;
 import com.humanity.vs.cards.cardsvshumanity.App;
+import com.humanity.vs.cards.cardsvshumanity.logic.entities_json.JsonGameStage1Data;
+import com.humanity.vs.cards.cardsvshumanity.logic.entities_json.JsonGameStage2Data;
+import com.humanity.vs.cards.cardsvshumanity.logic.entities_json.JsonGameStage3Data;
+import com.humanity.vs.cards.cardsvshumanity.logic.entities_json.JsonGameStage4Data;
+import com.humanity.vs.cards.cardsvshumanity.logic.enums.NetworkGameCommand;
 import com.humanity.vs.cards.cardsvshumanity.ui.entities_json.JsonGodLevelData;
 import com.humanity.vs.cards.cardsvshumanity.ui.entities_json.JsonPlayersInLobby;
 import com.humanity.vs.cards.cardsvshumanity.utils.EmptyUtils;
 import com.peak.salut.Callbacks.SalutDataCallback;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 
 /**
  * Created by robot on 17.11.15.
  */
 public class MySalutDataCallback implements SalutDataCallback {
 
-    private AllNetworkDataHandler handler;
+    private AllNetworkDataHandler allHandler;
 
-    public MySalutDataCallback(AllNetworkDataHandler handler) {
+    public MySalutDataCallback(AllNetworkDataHandler allHandler) {
 
-        this.handler = handler;
+        this.allHandler = allHandler;
     }
 
     @Override
@@ -42,9 +48,32 @@ public class MySalutDataCallback implements SalutDataCallback {
             return;
         }
 
-        if (JsonPlayersInLobby.class.toString().equals(data.classNameOfData)) {
-            handler.updatePlayersInLobbyList(data.jsonStringData);
+        // lobby players update
+        if (isClassOf(JsonPlayersInLobby.class, data.classNameOfData)) {
+            allHandler.onNetCmd_UpdatePlayersInLobbyList(data.jsonStringData);
+        }
+        // game commands
+        else if (isClassOf(JsonGameStage1Data.class, data.classNameOfData) ||
+                isClassOf(JsonGameStage2Data.class, data.classNameOfData) ||
+                isClassOf(JsonGameStage3Data.class, data.classNameOfData) ||
+                isClassOf(JsonGameStage4Data.class, data.classNameOfData)) {
+
+            NetworkGameCommand gameCommand = null;
+            if (isClassOf(JsonGameStage1Data.class, data.classNameOfData))
+                gameCommand = NetworkGameCommand.gameStage1;
+            if (isClassOf(JsonGameStage2Data.class, data.classNameOfData))
+                gameCommand = NetworkGameCommand.gameStage2;
+            if (isClassOf(JsonGameStage3Data.class, data.classNameOfData))
+                gameCommand = NetworkGameCommand.gameStage3;
+            if (isClassOf(JsonGameStage4Data.class, data.classNameOfData))
+                gameCommand = NetworkGameCommand.gameStage4;
+
+            allHandler.onNetCmd_HandleGameCommand(gameCommand, data.jsonStringData);
         }
 
+    }
+
+    private boolean isClassOf(Type className, String classNameString) {
+        return className.toString().equals(classNameString);
     }
 }

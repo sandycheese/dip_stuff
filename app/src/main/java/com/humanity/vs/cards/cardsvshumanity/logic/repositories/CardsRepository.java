@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.text.Html;
 import android.util.Log;
 
+import com.bluelinelabs.logansquare.LoganSquare;
 import com.google.gson.Gson;
 import com.humanity.vs.cards.cardsvshumanity.App;
 import com.humanity.vs.cards.cardsvshumanity.R;
@@ -29,9 +30,16 @@ import java.util.List;
  */
 // todo errors & nulls
 // todo make parser use a logan square (faster)
+// leave only original cards
 public class CardsRepository {
+
+    private static List<Card> cards;
+    private static int cardsHash = 0;
+
     // // FIXME: 15.11.15 too long loading time. serialize and save after first parse?
     public static List<Card> getAllCards(Context context, @Nullable RecoverySystem.ProgressListener progressCallback) {
+        if (cards != null && cardsHash == cards.hashCode())
+            return cards;
 
         long startTime = System.currentTimeMillis();
 
@@ -99,6 +107,10 @@ public class CardsRepository {
         long endTime = System.currentTimeMillis();
 
         Log.d(App.TAG, "cards loading time (ms): " + String.valueOf(endTime - startTime));
+
+        // cache
+        CardsRepository.cards = cards;
+        CardsRepository.cardsHash = cards.hashCode();
 
         return cards;
     }

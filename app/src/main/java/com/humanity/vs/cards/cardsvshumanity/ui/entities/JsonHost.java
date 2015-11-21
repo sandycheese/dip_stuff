@@ -7,7 +7,7 @@ import java.sql.Time;
 /**
  * Created by robot on 15.11.15.
  */
-public class Host {
+public class JsonHost {
     public String hostName;
     public String deviceName;
     public int playersCount;

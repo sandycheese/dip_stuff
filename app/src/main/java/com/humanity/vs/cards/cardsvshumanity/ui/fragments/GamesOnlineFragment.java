@@ -15,7 +15,7 @@ import android.view.ViewGroup;
 
 import com.humanity.vs.cards.cardsvshumanity.R;
 import com.humanity.vs.cards.cardsvshumanity.ui.adapters.HostsAdapter;
-import com.humanity.vs.cards.cardsvshumanity.ui.entities.Host;
+import com.humanity.vs.cards.cardsvshumanity.ui.entities.JsonHost;
 import com.humanity.vs.cards.cardsvshumanity.ui.interfaces.INetworkManagerProvider;
 import com.humanity.vs.cards.cardsvshumanity.ui.network.NetworkManager;
 import com.humanity.vs.cards.cardsvshumanity.utils.ErrorsHelper;
@@ -23,7 +23,6 @@ import com.humanity.vs.cards.cardsvshumanity.utils.FragmentsHelper;
 import com.peak.salut.Callbacks.SalutCallback;
 import com.peak.salut.SalutDevice;
 
-import java.sql.Time;
 import java.util.ArrayList;
 
 /**
@@ -51,9 +50,9 @@ public class GamesOnlineFragment extends Fragment {
 
             ArrayList<SalutDevice> devices = networkManager.getAllHosts();
 
-            ArrayList<Host> hosts = new ArrayList<>();
+            ArrayList<JsonHost> hosts = new ArrayList<>();
             for (SalutDevice device : devices) {
-                Host host = new Host();
+                JsonHost host = new JsonHost();
                 host.hostName = device.readableName;
                 host.deviceName = device.deviceName;
                 host.salutDevice = device;

@@ -30,4 +30,12 @@
         <item name="android:paddingTop">@dimen/recycle_view_padding_top</item>
     </style>
 
+    <style name="GameCardTextView">
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:lineSpacingExtra">@dimen/game_card_text_vertical_spacing</item>
+        <item name="android:textAppearance">?android:attr/textAppearanceSmall</item>
+        <item name="android:textColor">@android:color/primary_text_dark</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
 </resources>

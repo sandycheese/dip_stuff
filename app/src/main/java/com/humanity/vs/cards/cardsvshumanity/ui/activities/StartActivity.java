@@ -17,8 +17,8 @@ import com.humanity.vs.cards.cardsvshumanity.utils.WiFiDirectChecker;
 public class StartActivity extends Activity {
 
     // fixme turn off debug triggers when done
-    boolean enableWiDiCheck = false;
-    boolean enableCardsLoading = false;
+    boolean enableWiDiCheck = true;
+    boolean enableCardsLoading = true;
 
     ProgressBar progressBar;
 

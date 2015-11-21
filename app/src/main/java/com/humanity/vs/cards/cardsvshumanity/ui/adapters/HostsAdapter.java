@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.humanity.vs.cards.cardsvshumanity.R;
-import com.humanity.vs.cards.cardsvshumanity.ui.entities.Host;
+import com.humanity.vs.cards.cardsvshumanity.ui.entities.JsonHost;
 import com.humanity.vs.cards.cardsvshumanity.ui.network.NetworkManager;
 import com.peak.salut.Callbacks.SalutCallback;
 
@@ -19,13 +19,13 @@ import java.util.List;
  */
 public class HostsAdapter extends RecyclerView.Adapter<HostsAdapter.HostsViewHolder> {
 
-    private List<Host> items;
+    private List<JsonHost> items;
     private NetworkManager networkManager;
     private SalutCallback startRegisteringCallback;
     private SalutCallback registerSuccessCallback;
     private SalutCallback registerFailCallback;
 
-    public HostsAdapter(List<Host> hosts,
+    public HostsAdapter(List<JsonHost> hosts,
                         NetworkManager networkManager,
                         SalutCallback startRegisteringCallback, SalutCallback registerSuccessCallback,
                         SalutCallback registerFailCallback) {
@@ -50,7 +50,7 @@ public class HostsAdapter extends RecyclerView.Adapter<HostsAdapter.HostsViewHol
 
     @Override
     public void onBindViewHolder(HostsViewHolder holder, int position) {
-        final Host item = items.get(position);
+        final JsonHost item = items.get(position);
 
         holder.tvDeviceName.setText(item.deviceName);
         holder.tvHostShortInfo.setText(String.format("%s", item.hostName));

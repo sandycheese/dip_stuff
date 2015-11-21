@@ -2,6 +2,7 @@ package com.humanity.vs.cards.cardsvshumanity.ui.activities;
 
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -12,7 +13,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.humanity.vs.cards.cardsvshumanity.R;
+import com.humanity.vs.cards.cardsvshumanity.logic.helpers.NetworkGameCommandsSender;
+import com.humanity.vs.cards.cardsvshumanity.logic.interfaces.INetworkGameCommandsSender;
+import com.humanity.vs.cards.cardsvshumanity.logic.managers.GameManager;
 import com.humanity.vs.cards.cardsvshumanity.ui.fragments.GamesOnlineFragment;
+import com.humanity.vs.cards.cardsvshumanity.ui.interfaces.IGameManagerProvider;
+import com.humanity.vs.cards.cardsvshumanity.ui.interfaces.INetworkGameCommandsSenderProvider;
 import com.humanity.vs.cards.cardsvshumanity.ui.interfaces.INetworkManagerProvider;
 import com.humanity.vs.cards.cardsvshumanity.ui.network.AllNetworkDataHandler;
 import com.humanity.vs.cards.cardsvshumanity.ui.network.MySalutDataCallback;
@@ -26,11 +32,13 @@ import com.peak.salut.SalutServiceData;
 // todo create empty views for recycle view
 // todo add wi-fi enabled check
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, INetworkManagerProvider {
+        implements NavigationView.OnNavigationItemSelectedListener, INetworkManagerProvider, IGameManagerProvider, INetworkGameCommandsSenderProvider {
 
     NetworkManager networkManager;
     AllNetworkDataHandler allNetworkDataHandler;
 
+    GameManager gameManager;
+    NetworkGameCommandsSender networkGameCommandsSender;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +58,7 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         initNetwork();
+        initFields();
         initFirstFragment();
     }
 
@@ -58,6 +67,11 @@ public class MainActivity extends AppCompatActivity
 
         networkManager = new NetworkManager(this, allNetworkDataHandler);
         networkManager.initNetworkService();
+    }
+
+    private void initFields() {
+        gameManager = new GameManager();
+        networkGameCommandsSender = new NetworkGameCommandsSender(networkManager);
     }
 
     private void initFirstFragment() {
@@ -124,5 +138,15 @@ public class MainActivity extends AppCompatActivity
     @Override
     public NetworkManager getNetworkManager() {
         return this.networkManager;
+    }
+
+    @Override
+    public GameManager getGameManager() {
+        return this.gameManager;
+    }
+
+    @Override
+    public INetworkGameCommandsSender getNetworkCommandsSender() {
+        return this.networkGameCommandsSender;
     }
 }

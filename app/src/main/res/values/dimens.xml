@@ -11,4 +11,19 @@
     <dimen name="card_margin_right">4dp</dimen>
     <dimen name="recycle_view_padding_top">4dp</dimen>
     <dimen name="recycle_view_padding_bottom">4dp</dimen>
+
+    <dimen name="recycle_view_for_white_cards_margin_top">-16dp</dimen>
+    <dimen name="recycle_view_for_white_cards_padding_top">16dp</dimen>
+
+    <dimen name="game_card_corner_radius">10dp</dimen>
+    <dimen name="game_card_text_vertical_spacing">4dp</dimen>
+
+    <!--StaggeredGridLayoutManager for-->
+    <dimen name="white_card_left_padding">2dp</dimen>
+    <dimen name="recycle_view_for_white_cards_padding_left">2dp</dimen>
+    <dimen name="recycle_view_for_white_cards_padding_right">2dp</dimen>
+    <dimen name="white_cards_margin_left">2dp</dimen>
+    <dimen name="white_cards_margin_right">2dp</dimen>
+
+
 </resources>

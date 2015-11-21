@@ -127,7 +127,7 @@ public class GameLobbyFragment extends Fragment {
         btnLeaveGame = (Button) v.findViewById(R.id.btnLeaveLobby);
     }
 
-    private void initComponents(boolean startAsHost) {
+    private void initComponents(final boolean startAsHost) {
         btnStartGame.setVisibility(startAsHost ? View.VISIBLE : View.GONE);
         btnLeaveGame.setVisibility(startAsHost ? View.GONE : View.VISIBLE);
 
@@ -140,6 +140,19 @@ public class GameLobbyFragment extends Fragment {
             jsonPlayersInLobby.add(pseudoPlayer);
             rvLobbyClients.setAdapter(new LobbyClientsAdapter(jsonPlayersInLobby));
         }
+
+        btnStartGame.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Bundle bundle = new Bundle();
+                bundle.putBoolean(GameLobbyFragment.ARG_START_AS_HOST, startAsHost);
+
+                GameFragment fragment = new GameFragment();
+                fragment.setArguments(bundle);
+
+                FragmentsHelper.setFragment(getActivity(), R.id.rlContainer, fragment);
+            }
+        });
     }
 
     boolean initNetworkManager() {

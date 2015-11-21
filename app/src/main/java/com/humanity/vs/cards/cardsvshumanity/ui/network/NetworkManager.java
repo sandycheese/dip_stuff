@@ -134,4 +134,35 @@ public class NetworkManager {
             }
         });
     }
+
+    public SalutDevice thisDevice() {
+        return network.thisDevice;
+    }
+
+    public void sendDataToHost(String classOfData, String jsonData) {
+        JsonGodLevelData data = new JsonGodLevelData();
+        data.classNameOfData = classOfData;
+        data.jsonStringData = jsonData;
+
+        network.sendToHost(jsonData, new SalutCallback() {
+            @Override
+            public void call() {
+                Log.d(App.TAG, "Can't send data to host");
+            }
+        });
+    }
+
+    public void sendDataToClients(String classOfData, String jsonData) {
+        JsonGodLevelData data = new JsonGodLevelData();
+        data.classNameOfData = classOfData;
+        data.jsonStringData = jsonData;
+
+        network.sendToAllDevices(jsonData, new SalutCallback() {
+            @Override
+            public void call() {
+                Log.d(App.TAG, "Can't send data to clients");
+            }
+        });
+    }
+
 }
