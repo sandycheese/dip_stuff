@@ -193,6 +193,11 @@ public class GameManagerHelper {
 
     // host only
     public static void handleStage4Data(GameManager gameManager, JsonGameStage4Data jsonGameStage4Data, IHostStageCallback hostStageCallback) {
+        if (!gameManager.isStartedAsHost()) {
+            Log.d(TAG, "Invalid behavior. Stage 4 handler called not on the host");
+            return;
+        }
+
         String winnerId = jsonGameStage4Data.whiteCardsSelection.playerId;
 
         List<PlayerState> playerStates = gameManager.getPlayersStates();

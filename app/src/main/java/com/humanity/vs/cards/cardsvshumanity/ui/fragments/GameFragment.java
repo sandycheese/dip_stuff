@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
@@ -14,7 +15,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.google.gson.Gson;
 import com.humanity.vs.cards.cardsvshumanity.App;
 import com.humanity.vs.cards.cardsvshumanity.R;
 import com.humanity.vs.cards.cardsvshumanity.logic.entities.GameClient;
@@ -23,17 +23,17 @@ import com.humanity.vs.cards.cardsvshumanity.logic.entities_json.JsonCard;
 import com.humanity.vs.cards.cardsvshumanity.logic.entities_json.JsonGameStage1Data;
 import com.humanity.vs.cards.cardsvshumanity.logic.entities_json.JsonGameStage2Data;
 import com.humanity.vs.cards.cardsvshumanity.logic.entities_json.JsonGameStage3Data;
+import com.humanity.vs.cards.cardsvshumanity.logic.entities_json.JsonGameStage4Data;
 import com.humanity.vs.cards.cardsvshumanity.logic.entities_json.JsonPlayerState;
 import com.humanity.vs.cards.cardsvshumanity.logic.entities_json.JsonPlayersWhiteDeck;
 import com.humanity.vs.cards.cardsvshumanity.logic.entities_json.JsonWhiteCardsSelection;
-import com.humanity.vs.cards.cardsvshumanity.logic.enums.NetworkGameCommand;
-import com.humanity.vs.cards.cardsvshumanity.logic.enums.NetworkGameCommandDirection;
 import com.humanity.vs.cards.cardsvshumanity.logic.helpers.GameManagerHelper;
 import com.humanity.vs.cards.cardsvshumanity.logic.interfaces.IClientStageCallback;
 import com.humanity.vs.cards.cardsvshumanity.logic.interfaces.IGameUIUpdater;
 import com.humanity.vs.cards.cardsvshumanity.logic.interfaces.INetworkGameCommandsSender;
 import com.humanity.vs.cards.cardsvshumanity.logic.managers.GameManager;
 import com.humanity.vs.cards.cardsvshumanity.logic.repositories.CardsRepository;
+import com.humanity.vs.cards.cardsvshumanity.ui.adapters.SelectionAdapter;
 import com.humanity.vs.cards.cardsvshumanity.ui.adapters.WhiteCardsAdapter;
 import com.humanity.vs.cards.cardsvshumanity.ui.interfaces.IGameManagerProvider;
 import com.humanity.vs.cards.cardsvshumanity.ui.interfaces.INetworkGameCommandsSenderProvider;
@@ -44,6 +44,7 @@ import com.peak.salut.SalutDevice;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by robot on 20.11.15.
@@ -53,7 +54,6 @@ import java.util.Arrays;
 public class GameFragment extends Fragment implements IGameUIUpdater {
 
     public static final String CLIENT_NEW_GAME_STAGE_1_DATA = "CLIENT_NEW_GAME_STAGE_1_DATA";
-
 
     GameManager gameManager = null;
     INetworkGameCommandsSender networkCommandsSender = null;
@@ -72,10 +72,31 @@ public class GameFragment extends Fragment implements IGameUIUpdater {
     ImageView ivMessageToPlayer;
     Snackbar sbSendSelectedCards = null;
 
-    WhiteCardsAdapter.WhiteCardsAdapter_CardsSelectedCallback selectedCallback = new WhiteCardsAdapter.WhiteCardsAdapter_CardsSelectedCallback() {
+    boolean isKingNow = false;
+
+    IClientStageCallback stageCallback;
+
+    WhiteCardsAdapter.WhiteCardsAdapter_CardsSelectedCallback selectedCardsCallback = new WhiteCardsAdapter.WhiteCardsAdapter_CardsSelectedCallback() {
         @Override
-        public void selectedCallback(final ArrayList<JsonCard> selectedCards) {
-            initSnackbarForSelectionSend(selectedCards);
+        public void selected(final ArrayList<JsonCard> selectedCards) {
+            // todo is it only for selection? if so don't init every time
+            initSnackbarForSelectedCardsSend(selectedCards);
+            if (sbSendSelectedCards != null && !sbSendSelectedCards.isShown()) {
+                sbSendSelectedCards.show();
+            }
+        }
+
+        @Override
+        public void notSelectedYet() {
+            if (sbSendSelectedCards != null)
+                sbSendSelectedCards.dismiss();
+        }
+    };
+
+    SelectionAdapter.SelectionAdapter_SelectCallback selectedSelectionCallback = new SelectionAdapter.SelectionAdapter_SelectCallback() {
+        @Override
+        public void selected(JsonWhiteCardsSelection selection) {
+            initSnackbarForSelectedSelectionSend(selection);
             if (sbSendSelectedCards != null && !sbSendSelectedCards.isShown()) {
                 sbSendSelectedCards.show();
             }
@@ -102,7 +123,7 @@ public class GameFragment extends Fragment implements IGameUIUpdater {
         return view;
     }
 
-    void initSnackbarForSelectionSend(final ArrayList<JsonCard> selectedCards) {
+    void initSnackbarForSelectedCardsSend(final ArrayList<JsonCard> selectedCards) {
         try {
             sbSendSelectedCards = Snackbar.make(view, R.string.text_question_done, Snackbar.LENGTH_INDEFINITE);
             sbSendSelectedCards.setAction(R.string.text_yes, new View.OnClickListener() {
@@ -115,6 +136,21 @@ public class GameFragment extends Fragment implements IGameUIUpdater {
             Log.d(App.TAG, "Unexpected application behaviour");
         }
     }
+
+    void initSnackbarForSelectedSelectionSend(final JsonWhiteCardsSelection selectedSelection) {
+        try {
+            sbSendSelectedCards = Snackbar.make(view, R.string.text_question_done, Snackbar.LENGTH_INDEFINITE);
+            sbSendSelectedCards.setAction(R.string.text_yes, new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    sendStage4Data(selectedSelection);
+                }
+            });
+        } catch (Exception e) {
+            Log.d(App.TAG, "Unexpected application behaviour");
+        }
+    }
+
 
     private void findComponents() {
         tvBlackCard = (TextView) view.findViewById(R.id.tvBlackCardText);
@@ -184,9 +220,10 @@ public class GameFragment extends Fragment implements IGameUIUpdater {
         }
     }
 
-    // todo remove hardcoded strings
     @Override
     public void makeStage1Updates(JsonGameStage1Data jsonGameStage1Data, IClientStageCallback stageCallback) {
+        this.stageCallback = stageCallback;
+
         // check end game
         if (jsonGameStage1Data.endGame) {
             getActivity().setTitle(getActivity().getString(R.string.text_end_game));
@@ -198,15 +235,9 @@ public class GameFragment extends Fragment implements IGameUIUpdater {
         // todo implement
 
         // check is king
-        boolean isKing = false;
-        for (JsonPlayerState p : jsonGameStage1Data.playerStates) {
-            if (p.isKing && p.id.equals(networkManager.thisDevice().instanceName)) {
-                isKing = true;
-                break;
-            }
-        }
+        isKingNow = isCurrentPlayerKing(jsonGameStage1Data.playerStates);
 
-        if (isKing) {
+        if (isKingNow) {
             rvWhiteCards.setVisibility(View.GONE);
             llMessageToPlayer.setVisibility(View.VISIBLE);
 
@@ -236,7 +267,7 @@ public class GameFragment extends Fragment implements IGameUIUpdater {
             rvWhiteCards.setAdapter(new WhiteCardsAdapter(
                     getActivity(),
                     Arrays.asList(playerWhiteCards.whiteCards),
-                    selectedCallback,
+                    selectedCardsCallback,
                     jsonGameStage1Data.blackCard.answersCount));
         }
 
@@ -244,27 +275,66 @@ public class GameFragment extends Fragment implements IGameUIUpdater {
 
     @Override
     public void makeStage3Updates(JsonGameStage3Data jsonGameStage3Data, IClientStageCallback stageCallback) {
+        this.stageCallback = stageCallback;
 
+        if (!isKingNow) {
+            Log.d(App.TAG, "makeStage3Updates: player is not the king. skipping the stage");
+            return;
+        }
+
+        List<JsonWhiteCardsSelection> selections = Arrays.asList(jsonGameStage3Data.whiteCardsSelections);
+
+        rvWhiteCards.setAdapter(new SelectionAdapter(selections, selectedSelectionCallback));
+        rvWhiteCards.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        rvWhiteCards.setVisibility(View.VISIBLE);
+        llMessageToPlayer.setVisibility(View.GONE);
     }
 
     void sendStage2Data(ArrayList<JsonCard> selectedCards) {
+        // logic
         JsonGameStage2Data stage2Data = new JsonGameStage2Data();
         stage2Data.whiteCardsSelection = new JsonWhiteCardsSelection();
         stage2Data.whiteCardsSelection.playerId = networkManager.thisDevice().instanceName;
         stage2Data.whiteCardsSelection.selectedWhiteCards = selectedCards.toArray(new JsonCard[selectedCards.size()]);
 
-        String jsonData = new Gson().toJson(stage2Data, JsonGameStage2Data.class);
+        if (stageCallback != null) {
+            stageCallback.stage2_send_white_cards_selection(stage2Data);
+        }
 
-        networkCommandsSender.sendNetworkGameCommand(
-                NetworkGameCommand.gameStage2,
-                jsonData,
-                NetworkGameCommandDirection.toHost);
-
+        // UI
         getActivity().setTitle(getActivity().getString(R.string.msg_sent_to_the_king));
         tvMessageToPlayer.setText(getActivity().getString(R.string.msg_you_selected_cards));
-        ivMessageToPlayer.setImageResource(R.drawable.ic_info_outline_grey_700_48dp);
+        ivMessageToPlayer.setImageResource(R.drawable.ic_group_grey_700_48dp);
 
         rvWhiteCards.setVisibility(View.GONE);
         llMessageToPlayer.setVisibility(View.VISIBLE);
+    }
+
+    void sendStage4Data(JsonWhiteCardsSelection selectedSelection) {
+        // logic
+        JsonGameStage4Data stage4Data = new JsonGameStage4Data();
+        stage4Data.whiteCardsSelection = selectedSelection;
+
+        if (stageCallback != null) {
+            stageCallback.stage4_send_selected_round_winner(stage4Data);
+        }
+
+        // UI
+        tvMessageToPlayer.setText(getActivity().getString(R.string.msg_you_selected_selection));
+        ivMessageToPlayer.setImageResource(R.drawable.ic_gesture_grey_700_48dp);
+
+        rvWhiteCards.setVisibility(View.GONE);
+        llMessageToPlayer.setVisibility(View.VISIBLE);
+    }
+
+    boolean isCurrentPlayerKing(JsonPlayerState[] playerStates) {
+        for (JsonPlayerState p : playerStates) {
+            if (p.isKing && p.id.equals(networkManager.thisDevice().instanceName)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

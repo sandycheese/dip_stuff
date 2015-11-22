@@ -86,12 +86,11 @@ public class WhiteCardsAdapter extends RecyclerView.Adapter<WhiteCardsAdapter.Wh
         }
 
         if (isCardSelected) {
-            holder.tvSelectedCardOrder.setVisibility(View.VISIBLE);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 holder.cvGameCard.setElevation(floatingElevation);
             }
         } else {
-            holder.tvSelectedCardOrder.setVisibility(View.INVISIBLE);
+            holder.tvSelectedCardOrder.setText("");
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 holder.cvGameCard.setElevation(defaultElevation);
             }
@@ -108,7 +107,7 @@ public class WhiteCardsAdapter extends RecyclerView.Adapter<WhiteCardsAdapter.Wh
                     }
                 }
             }
-            allSelectedCallback.selectedCallback(selectedCards);
+            allSelectedCallback.selected(selectedCards);
         } else if (allSelectedCallback != null) {
             allSelectedCallback.notSelectedYet();
         }
@@ -152,7 +151,7 @@ public class WhiteCardsAdapter extends RecyclerView.Adapter<WhiteCardsAdapter.Wh
     }
 
     public interface WhiteCardsAdapter_CardsSelectedCallback {
-        void selectedCallback(ArrayList<JsonCard> selectedCards);
+        void selected(ArrayList<JsonCard> selectedCards);
 
         void notSelectedYet();
     }

@@ -151,35 +151,23 @@ public class NetworkManager {
     }
 
     // fixme IT'S IMPOSSIBLE TO CONTROL WHO WILL BECOME THE HOST. CHANGE ARCHITECTURE. will send to everyone at first time
-    public void sendDataToHost(String classOfData, String jsonData) {
-        Log.d(App.TAG, "CLIENT: wanna send data to host: " + classOfData);
+    public void sendDataToAll(String classOfData, String jsonData) {
+        Log.d(App.TAG, "wanna send some data: " + classOfData);
 
         JsonGodLevelData data = new JsonGodLevelData();
         data.classNameOfData = classOfData;
         data.jsonStringData = jsonData;
 
-        network.sendToAllDevices(data, new SalutCallback() {
+        SalutCallback failCallback = new SalutCallback() {
             @Override
             public void call() {
                 Log.d(App.TAG, "Can't send data to host");
             }
-        });
+        };
+
+        if (network.isRunningAsHost)
+            network.sendToAllDevices(data, failCallback);
+        else
+            network.sendToHost(data, failCallback);
     }
-
-    // fixme IT'S IMPOSSIBLE TO CONTROL WHO WILL BECOME THE HOST. CHANGE ARCHITECTURE. will send to everyone at first time
-    public void sendDataToClients(String classOfData, String jsonData) {
-        Log.d(App.TAG, "SERVER: wanna send data to clients: " + classOfData);
-
-        JsonGodLevelData data = new JsonGodLevelData();
-        data.classNameOfData = classOfData;
-        data.jsonStringData = jsonData;
-
-        network.sendToAllDevices(data, new SalutCallback() {
-            @Override
-            public void call() {
-                Log.d(App.TAG, "Can't send data to clients");
-            }
-        });
-    }
-
 }

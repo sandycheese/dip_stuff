@@ -182,7 +182,7 @@ public class GameManager implements INetworkGameCommandsHandler {
         String jsonData = new Gson().toJson(data, JsonGameStage1Data.class);
 
         networkGameStage1_client_handler(data);
-        networkCommandsSender.sendNetworkGameCommand(NetworkGameCommand.gameStage1, jsonData, NetworkGameCommandDirection.toClients);
+        networkCommandsSender.sendNetworkGameCommand(NetworkGameCommand.gameStage1, jsonData);
     }
 
     // STAGE 1: client shows a black card; white cards; players states; a round result; the end game;
@@ -202,7 +202,7 @@ public class GameManager implements INetworkGameCommandsHandler {
         if (isHost)
             networkGameStage2_host_handler(data);
         else
-            networkCommandsSender.sendNetworkGameCommand(NetworkGameCommand.gameStage2, jsonData, NetworkGameCommandDirection.toHost);
+            networkCommandsSender.sendNetworkGameCommand(NetworkGameCommand.gameStage2, jsonData);
     }
 
     // STAGE 2: server receives and handles selected white cards
@@ -226,7 +226,7 @@ public class GameManager implements INetworkGameCommandsHandler {
         String jsonData = new Gson().toJson(data, JsonGameStage3Data.class);
 
         networkGameStage3_client_handler(data);
-        networkCommandsSender.sendNetworkGameCommand(NetworkGameCommand.gameStage3, jsonData, NetworkGameCommandDirection.toClients);
+        networkCommandsSender.sendNetworkGameCommand(NetworkGameCommand.gameStage3, jsonData);
     }
 
     // STAGE 3: client shows chosen white cards; the king selects round winner cards
@@ -246,7 +246,7 @@ public class GameManager implements INetworkGameCommandsHandler {
         if (isHost)
             networkGameStage4_host_handler(data);
         else
-            networkCommandsSender.sendNetworkGameCommand(NetworkGameCommand.gameStage4, jsonData, NetworkGameCommandDirection.toHost);
+            networkCommandsSender.sendNetworkGameCommand(NetworkGameCommand.gameStage4, jsonData);
     }
 
     // STAGE 4: server receives and handles round winner cards;

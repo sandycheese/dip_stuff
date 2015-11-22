@@ -24,7 +24,7 @@ public class NetworkGameCommandsSender implements INetworkGameCommandsSender {
     }
 
     @Override
-    public void sendNetworkGameCommand(NetworkGameCommand networkGameCommand, String jsonData, NetworkGameCommandDirection direction) {
+    public void sendNetworkGameCommand(NetworkGameCommand networkGameCommand, String jsonData) {
         Log.d(App.TAG, "Sending network game command: " + networkGameCommand);
 
         String dataClass = null;
@@ -44,10 +44,8 @@ public class NetworkGameCommandsSender implements INetworkGameCommandsSender {
                 break;
         }
 
-        if (direction == NetworkGameCommandDirection.toHost)
-            networkManager.sendDataToHost(dataClass, jsonData);
-        else
-            networkManager.sendDataToClients(dataClass, jsonData);
+        // it's impossible to control wi-fi direct host choice
+        networkManager.sendDataToAll(dataClass, jsonData);
     }
 
     @Override

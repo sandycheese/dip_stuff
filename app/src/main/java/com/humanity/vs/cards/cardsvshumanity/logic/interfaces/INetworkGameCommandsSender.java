@@ -7,7 +7,7 @@ import com.humanity.vs.cards.cardsvshumanity.logic.enums.NetworkGameCommandDirec
  * Created by robot on 08.11.15.
  */
 public interface INetworkGameCommandsSender {
-    void sendNetworkGameCommand(NetworkGameCommand networkGameCommand, String jsonData, NetworkGameCommandDirection direction);
+    void sendNetworkGameCommand(NetworkGameCommand networkGameCommand, String jsonData);
 
     void endGame();
 }
