@@ -26,8 +26,8 @@
 
     <!--custom recycleview-->
     <style name="RecycleViewFix">
-        <item name="android:paddingBottom">@dimen/recycle_view_padding_bottom</item>
-        <item name="android:paddingTop">@dimen/recycle_view_padding_top</item>
+        <item name="android:paddingBottom">@dimen/recycle_view_padding_top_and_bottom</item>
+        <item name="android:paddingTop">@dimen/recycle_view_padding_top_and_bottom</item>
     </style>
 
     <style name="GameCardTextView">

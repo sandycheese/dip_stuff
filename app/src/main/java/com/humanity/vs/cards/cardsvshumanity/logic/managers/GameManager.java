@@ -39,14 +39,17 @@ import java.util.List;
 // todo a non-authoritative architecture. too many time for implementation. and there is no reasons to secure the game
 public class GameManager implements INetworkGameCommandsHandler {
 
-    private List<PlayerState> playersStates;
-    private List<Card> cards;
-    private List<Card> unusedCards;
-    private MatchRules matchRules;
-    private INetworkGameCommandsSender networkCommandsSender;
-    private IGameUIUpdater gameUIUpdater;
-    private boolean isHost;
-    private List<JsonWhiteCardsSelection> currentWhiteCardsSelections = new ArrayList<>();
+    List<PlayerState> playersStates;
+    List<Card> cards;
+    List<Card> unusedCards;
+    MatchRules matchRules;
+    INetworkGameCommandsSender networkCommandsSender;
+    IGameUIUpdater gameUIUpdater;
+    boolean isHost;
+    List<JsonWhiteCardsSelection> currentWhiteCardsSelections = new ArrayList<>();
+
+    boolean startedAsHost = false;
+    boolean startedAsClient = false;
 
     private IClientStageCallback clientStageCallback = new IClientStageCallback() {
         @Override
@@ -82,6 +85,9 @@ public class GameManager implements INetworkGameCommandsHandler {
     public void newGameAsHost(INetworkGameCommandsSender commandsSender, IGameUIUpdater gameUIUpdater, List<GameClient> gameClients, List<Card> allCards, MatchRules matchRules) {
         Log.d(App.TAG, "newGameAsHost");
 
+        this.startedAsHost = true;
+        this.startedAsClient = false;
+
         this.networkCommandsSender = commandsSender;
         this.gameUIUpdater = gameUIUpdater;
 
@@ -103,6 +109,9 @@ public class GameManager implements INetworkGameCommandsHandler {
 
     public void newGameAsClient(INetworkGameCommandsSender commandsSender, IGameUIUpdater gameUIUpdater) {
         Log.d(App.TAG, "newGameAsClient");
+
+        this.startedAsClient = true;
+        this.startedAsHost = false;
 
         this.networkCommandsSender = commandsSender;
         this.gameUIUpdater = gameUIUpdater;
@@ -181,7 +190,7 @@ public class GameManager implements INetworkGameCommandsHandler {
     private void networkGameStage1_client_handler(JsonGameStage1Data jsonGameStage1Data) {
         Log.d(App.TAG, "networkGameStage1_client_handler");
 
-        gameUIUpdater.makeStage1Updates(jsonGameStage1Data, clientStageCallback, networkCommandsSender.getClientNetworkId());
+        gameUIUpdater.makeStage1Updates(jsonGameStage1Data, clientStageCallback);
     }
 
     // STAGE 2: client sends back selected white cards;
@@ -225,7 +234,7 @@ public class GameManager implements INetworkGameCommandsHandler {
     private void networkGameStage3_client_handler(JsonGameStage3Data jsonGameStage3Data) {
         Log.d(App.TAG, "networkGameStage3_client_handler");
 
-        gameUIUpdater.makeStage3Updates(jsonGameStage3Data, clientStageCallback, networkCommandsSender.getClientNetworkId());
+        gameUIUpdater.makeStage3Updates(jsonGameStage3Data, clientStageCallback);
     }
 
     // STAGE 4: client sends selected round winner cards;
@@ -250,6 +259,9 @@ public class GameManager implements INetworkGameCommandsHandler {
 
     private void endGame() {
         Log.d(App.TAG, "endGame");
+
+        this.startedAsHost = false;
+        this.startedAsClient = false;
 
         networkCommandsSender.endGame();
     }
@@ -315,5 +327,13 @@ public class GameManager implements INetworkGameCommandsHandler {
 
     public void setRoundResult(JsonRoundResult roundResult) {
         this.roundResult = roundResult;
+    }
+
+    public boolean isStartedAsHost() {
+        return this.startedAsHost;
+    }
+
+    public boolean isStartedAsClient() {
+        return this.startedAsClient;
     }
 }

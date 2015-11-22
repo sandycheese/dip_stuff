@@ -20,6 +20,8 @@ import java.util.ArrayList;
  * Created by robot on 17.11.15.
  */
 public class NetworkManager {
+    private static final long SLEEP_BETWEEN_CONNECT_AND_SENDING_DATA = 1000;
+
     private final Activity activity;
 
     private AllNetworkDataHandler allNetworkDataHandler;
@@ -67,8 +69,16 @@ public class NetworkManager {
         network.startNetworkService(new SalutDeviceCallback() {
             @Override
             public void call(SalutDevice device) {
-                clientConnectedCallback.call();
+
                 Log.d(App.TAG, "HOST: '" + device.readableName + "' has connected");
+                Log.d(App.TAG, "HOST: sleep a little (ms): " + SLEEP_BETWEEN_CONNECT_AND_SENDING_DATA);
+                try {
+                    Thread.sleep(SLEEP_BETWEEN_CONNECT_AND_SENDING_DATA);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    Log.d(App.TAG, "Fail to sleep");
+                }
+                clientConnectedCallback.call();
             }
         }, new SalutCallback() {
             @Override
@@ -125,6 +135,7 @@ public class NetworkManager {
     }
 
     public void updateLobbyForClients() {
+        Log.d(App.TAG, "HOST: Trying to send a lobby players list");
         JsonGodLevelData jsonData = JsonPlayersInLobby.getJsonGodLevelData(getAllDevices());
 
         network.sendToAllDevices(jsonData, new SalutCallback() {
@@ -139,12 +150,15 @@ public class NetworkManager {
         return network.thisDevice;
     }
 
+    // fixme IT'S IMPOSSIBLE TO CONTROL WHO WILL BECOME THE HOST. CHANGE ARCHITECTURE. will send to everyone at first time
     public void sendDataToHost(String classOfData, String jsonData) {
+        Log.d(App.TAG, "CLIENT: wanna send data to host: " + classOfData);
+
         JsonGodLevelData data = new JsonGodLevelData();
         data.classNameOfData = classOfData;
         data.jsonStringData = jsonData;
 
-        network.sendToHost(jsonData, new SalutCallback() {
+        network.sendToAllDevices(data, new SalutCallback() {
             @Override
             public void call() {
                 Log.d(App.TAG, "Can't send data to host");
@@ -152,12 +166,15 @@ public class NetworkManager {
         });
     }
 
+    // fixme IT'S IMPOSSIBLE TO CONTROL WHO WILL BECOME THE HOST. CHANGE ARCHITECTURE. will send to everyone at first time
     public void sendDataToClients(String classOfData, String jsonData) {
+        Log.d(App.TAG, "SERVER: wanna send data to clients: " + classOfData);
+
         JsonGodLevelData data = new JsonGodLevelData();
         data.classNameOfData = classOfData;
         data.jsonStringData = jsonData;
 
-        network.sendToAllDevices(jsonData, new SalutCallback() {
+        network.sendToAllDevices(data, new SalutCallback() {
             @Override
             public void call() {
                 Log.d(App.TAG, "Can't send data to clients");

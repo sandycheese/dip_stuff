@@ -12,8 +12,8 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:paddingBottom="@dimen/recycle_view_padding_bottom"
-        android:paddingTop="@dimen/recycle_view_padding_top" />
+        android:paddingBottom="@dimen/recycle_view_padding_top_and_bottom"
+        android:paddingTop="@dimen/recycle_view_padding_top_and_bottom" />
 
     <View
         android:id="@+id/dividerForButtons"

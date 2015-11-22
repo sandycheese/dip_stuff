@@ -1,5 +1,8 @@
 package com.humanity.vs.cards.cardsvshumanity.logic.helpers;
 
+import android.util.Log;
+
+import com.humanity.vs.cards.cardsvshumanity.App;
 import com.humanity.vs.cards.cardsvshumanity.logic.entities_json.JsonGameStage1Data;
 import com.humanity.vs.cards.cardsvshumanity.logic.entities_json.JsonGameStage2Data;
 import com.humanity.vs.cards.cardsvshumanity.logic.entities_json.JsonGameStage3Data;
@@ -22,30 +25,29 @@ public class NetworkGameCommandsSender implements INetworkGameCommandsSender {
 
     @Override
     public void sendNetworkGameCommand(NetworkGameCommand networkGameCommand, String jsonData, NetworkGameCommandDirection direction) {
-        if (direction == NetworkGameCommandDirection.toHost) {
-            String dataClass = null;
-            switch (networkGameCommand) {
-                case gameStage1:
-                    dataClass = JsonGameStage1Data.class.toString();
-                    break;
-                case gameStage2:
-                    dataClass = JsonGameStage2Data.class.toString();
-                    break;
-                case gameStage3:
-                    dataClass = JsonGameStage3Data.class.toString();
-                    break;
-                case gameStage4:
-                    dataClass = JsonGameStage4Data.class.toString();
-                    break;
-            }
+        Log.d(App.TAG, "Sending network game command: " + networkGameCommand);
 
-            networkManager.sendDataToHost(dataClass, jsonData);
+        String dataClass = null;
+
+        switch (networkGameCommand) {
+            case gameStage1:
+                dataClass = JsonGameStage1Data.class.toString();
+                break;
+            case gameStage2:
+                dataClass = JsonGameStage2Data.class.toString();
+                break;
+            case gameStage3:
+                dataClass = JsonGameStage3Data.class.toString();
+                break;
+            case gameStage4:
+                dataClass = JsonGameStage4Data.class.toString();
+                break;
         }
-    }
 
-    @Override
-    public String getClientNetworkId() {
-        return networkManager.thisDevice().instanceName;
+        if (direction == NetworkGameCommandDirection.toHost)
+            networkManager.sendDataToHost(dataClass, jsonData);
+        else
+            networkManager.sendDataToClients(dataClass, jsonData);
     }
 
     @Override

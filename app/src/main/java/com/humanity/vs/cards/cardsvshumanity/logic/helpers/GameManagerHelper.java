@@ -25,6 +25,7 @@ import java.util.Random;
 /**
  * Created by robot on 08.11.15.
  */
+// todo do not generate cards for the king player
 public class GameManagerHelper {
     private static final String TAG = "ddd";
 
@@ -138,6 +139,11 @@ public class GameManagerHelper {
 
     // host only
     public static void handleStage2Data(GameManager gameManager, JsonGameStage2Data jsonGameStage2Data, IHostStageCallback hostStageCallback) {
+        if (!gameManager.isStartedAsHost()) {
+            Log.d(TAG, "Invalid behavior. Stage 2 handler called not on the host");
+            return;
+        }
+
         List<JsonWhiteCardsSelection> currentSelections = gameManager.getCurrentWhiteCardsSelections();
         List<PlayerState> playerStates = gameManager.getPlayersStates();
 

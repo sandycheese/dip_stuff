@@ -11,12 +11,12 @@ import com.humanity.vs.cards.cardsvshumanity.logic.interfaces.IGameUIUpdater;
 public class GameUIUpdater implements IGameUIUpdater {
 
     @Override
-    public void makeStage1Updates(JsonGameStage1Data jsonGameStage1Data, IClientStageCallback clientStageCallback, String playerId) {
+    public void makeStage1Updates(JsonGameStage1Data jsonGameStage1Data, IClientStageCallback clientStageCallback) {
 
     }
 
     @Override
-    public void makeStage3Updates(JsonGameStage3Data jsonGameStage3Data, IClientStageCallback stageCallback, String playerId) {
+    public void makeStage3Updates(JsonGameStage3Data jsonGameStage3Data, IClientStageCallback stageCallback) {
 
     }
 }

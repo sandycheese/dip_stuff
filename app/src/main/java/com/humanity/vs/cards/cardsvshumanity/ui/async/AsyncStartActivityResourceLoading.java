@@ -9,6 +9,7 @@ import com.humanity.vs.cards.cardsvshumanity.ui.activities.StartActivity;
 /**
  * Created by robot on 15.11.15.
  */
+// todo make skip feature (if not a host)
 public class AsyncStartActivityResourceLoading extends AsyncTask<Void, Integer, Void> {
 
     StartActivity activity;

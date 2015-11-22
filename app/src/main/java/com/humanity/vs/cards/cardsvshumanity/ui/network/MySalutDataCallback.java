@@ -70,7 +70,6 @@ public class MySalutDataCallback implements SalutDataCallback {
 
             allHandler.onNetCmd_HandleGameCommand(gameCommand, data.jsonStringData);
         }
-
     }
 
     private boolean isClassOf(Type className, String classNameString) {
