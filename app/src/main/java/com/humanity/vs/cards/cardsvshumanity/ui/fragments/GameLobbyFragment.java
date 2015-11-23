@@ -35,7 +35,7 @@ import java.util.Arrays;
 // todo make kick function?
 public class GameLobbyFragment extends Fragment {
 
-    public static final String ARG_START_AS_HOST = "ARG_START_AS_HOST";
+    public static final String ARG_START_SERVICE = "ARG_START_SERVICE";
 
     private NetworkManager networkManager;
 
@@ -46,25 +46,20 @@ public class GameLobbyFragment extends Fragment {
     SalutCallback onSomeoneConnected = new SalutCallback() {
         @Override
         public void call() {
-            ArrayList<SalutDevice> allClients = networkManager.getAllDevices();
-            ArrayList<JsonPlayerInLobby> playersInLobby = new ArrayList<>();
-            for (SalutDevice device : allClients) {
-                JsonPlayerInLobby playerInLobby = new JsonPlayerInLobby(device);
-                playersInLobby.add(playerInLobby);
-            }
+            rvLobbyClients.setAdapter(new LobbyClientsAdapter(getConnectedPlayers()));
 
-            rvLobbyClients.setAdapter(new LobbyClientsAdapter(playersInLobby));
-
+            updateUiThatDependsOnHost();
             networkManager.updateLobbyForClients();
         }
     };
 
-    SalutCallback onCreateHostFail = new SalutCallback() {
+
+    SalutCallback onCreateLobbyFail = new SalutCallback() {
         @Override
         public void call() {
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setTitle(R.string.text_sorry);
-            builder.setMessage(R.string.msg_unable_create_host);
+            builder.setMessage(R.string.msg_unable_create_lobby);
             builder.setCancelable(false);
             builder.setPositiveButton(R.string.text_ok, new DialogInterface.OnClickListener() {
                 @Override
@@ -85,38 +80,45 @@ public class GameLobbyFragment extends Fragment {
         findComponents(view);
 
         if (initNetworkManager()) {
-            boolean startAsHost = false;
+            boolean createService = false;
+            Bundle arguments = getArguments();
+            if (arguments != null)
+                createService = arguments.getBoolean(ARG_START_SERVICE);
 
-            Bundle bundle = getArguments();
-
-            if (bundle != null)
-                startAsHost = bundle.getBoolean(ARG_START_AS_HOST);
-
-            if (startAsHost)
-                startHostMode();
+            if (createService)
+                startService();
             else
                 startClientMode();
 
-            initComponents(startAsHost);
-
-            String extendedTitle = String.format("%s - %s",
-                    getActivity().getString(R.string.title_game_lobby),
-                    startAsHost ?
-                            getActivity().getString(R.string.text_host) :
-                            getActivity().getString(R.string.text_client));
-
-            getActivity().setTitle(extendedTitle);
+            updateUiThatDependsOnHost();
         }
 
         return view;
     }
 
-    private void startHostMode() {
-        networkManager.startHost(onSomeoneConnected, onCreateHostFail);
+    private void updateUiThatDependsOnHost() {
+        Log.d(App.TAG, "Someone connected, updating UI");
+
+        boolean startAsHost = networkManager.isDeviceHost();
+
+        initComponents(startAsHost);
+
+        String extendedTitle = String.format("%s - %s",
+                getActivity().getString(R.string.title_game_lobby),
+                startAsHost ?
+                        getActivity().getString(R.string.text_host) :
+                        getActivity().getString(R.string.text_client));
+
+        getActivity().setTitle(extendedTitle);
+    }
+
+    private void startService() {
+        Log.d(App.TAG, "Started as host");
+        networkManager.startNetworkService(onSomeoneConnected, onCreateLobbyFail);
     }
 
     private void startClientMode() {
-
+        Log.d(App.TAG, "Started as client");
     }
 
     void findComponents(View v) {
@@ -132,20 +134,14 @@ public class GameLobbyFragment extends Fragment {
         btnLeaveGame.setVisibility(startAsHost ? View.GONE : View.VISIBLE);
 
         if (startAsHost) {
-            ArrayList<JsonPlayerInLobby> jsonPlayersInLobby = new ArrayList<>();
-            JsonPlayerInLobby pseudoPlayer = new JsonPlayerInLobby();
-            pseudoPlayer.deviceName = getString(R.string.text_you);
-            pseudoPlayer.readableName = Build.MODEL;
-
-            jsonPlayersInLobby.add(pseudoPlayer);
-            rvLobbyClients.setAdapter(new LobbyClientsAdapter(jsonPlayersInLobby));
+            rvLobbyClients.setAdapter(new LobbyClientsAdapter(getConnectedPlayers()));
         }
 
         btnStartGame.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Bundle bundle = new Bundle();
-                bundle.putBoolean(GameLobbyFragment.ARG_START_AS_HOST, startAsHost);
+                bundle.putBoolean(GameLobbyFragment.ARG_START_SERVICE, startAsHost);
 
                 GameFragment fragment = new GameFragment();
                 fragment.setArguments(bundle);
@@ -171,5 +167,16 @@ public class GameLobbyFragment extends Fragment {
     public void updateLobbyPlayersList(JsonPlayerInLobby[] players) {
         Log.d(App.TAG, "Updating a players list on lobby. Players count: " + players.length);
         rvLobbyClients.setAdapter(new LobbyClientsAdapter(new ArrayList<>(Arrays.asList(players))));
+    }
+
+    ArrayList<JsonPlayerInLobby> getConnectedPlayers() {
+        ArrayList<SalutDevice> allClients = networkManager.getAllDevices();
+        ArrayList<JsonPlayerInLobby> playersInLobby = new ArrayList<>();
+        for (SalutDevice device : allClients) {
+            JsonPlayerInLobby playerInLobby = new JsonPlayerInLobby(device);
+            playersInLobby.add(playerInLobby);
+        }
+
+        return playersInLobby;
     }
 }

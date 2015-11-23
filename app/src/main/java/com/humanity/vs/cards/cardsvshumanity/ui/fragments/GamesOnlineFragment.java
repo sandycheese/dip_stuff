@@ -14,8 +14,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.humanity.vs.cards.cardsvshumanity.R;
-import com.humanity.vs.cards.cardsvshumanity.ui.adapters.HostsAdapter;
-import com.humanity.vs.cards.cardsvshumanity.ui.entities.JsonHost;
+import com.humanity.vs.cards.cardsvshumanity.ui.adapters.LobbiesAdapter;
+import com.humanity.vs.cards.cardsvshumanity.ui.entities.JsonLobby;
 import com.humanity.vs.cards.cardsvshumanity.ui.interfaces.INetworkManagerProvider;
 import com.humanity.vs.cards.cardsvshumanity.ui.network.NetworkManager;
 import com.humanity.vs.cards.cardsvshumanity.utils.ErrorsHelper;
@@ -36,45 +36,45 @@ public class GamesOnlineFragment extends Fragment {
     NetworkManager networkManager;
 
     FloatingActionButton fabCreateGame;
-    FloatingActionButton fabUpdateHostsList;
-    RecyclerView rvHosts;
+    FloatingActionButton fabUpdateLobbiesList;
+    RecyclerView rvLobbies;
 
-    AlertDialog pdHostUpdating;
-    AlertDialog pdConnectingToHost;
-    AlertDialog adCantConnectToHost;
+    AlertDialog pdLobbiesUpdating;
+    AlertDialog pdConnectingToLobby;
+    AlertDialog adCantConnectToLobby;
 
-    SalutCallback onDiscoverHostsDoneHandler = new SalutCallback() {
+    SalutCallback onDiscoverLobbiesDoneHandler = new SalutCallback() {
         @Override
         public void call() {
-            pdHostUpdating.dismiss();
+            pdLobbiesUpdating.dismiss();
 
-            ArrayList<SalutDevice> devices = networkManager.getAllHosts();
+            ArrayList<SalutDevice> devices = networkManager.getAllDiscoveredDevices();
 
-            ArrayList<JsonHost> hosts = new ArrayList<>();
+            ArrayList<JsonLobby> lobbies = new ArrayList<>();
             for (SalutDevice device : devices) {
-                JsonHost host = new JsonHost();
-                host.hostName = device.readableName;
-                host.deviceName = device.deviceName;
-                host.salutDevice = device;
+                JsonLobby lobby = new JsonLobby();
+                lobby.serviceName = device.readableName;
+                lobby.deviceName = device.deviceName;
+                lobby.salutDevice = device;
 
-                hosts.add(host);
+                lobbies.add(lobby);
             }
 
-            rvHosts.setAdapter(new HostsAdapter(hosts, networkManager, onStartRegistering, onSuccessfullyRegistered, onFailToRegister));
+            rvLobbies.setAdapter(new LobbiesAdapter(lobbies, networkManager, onStartRegistering, onSuccessfullyRegistered, onFailToRegister));
         }
     };
 
     SalutCallback onStartRegistering = new SalutCallback() {
         @Override
         public void call() {
-            pdConnectingToHost.show();
+            pdConnectingToLobby.show();
         }
     };
 
     SalutCallback onSuccessfullyRegistered = new SalutCallback() {
         @Override
         public void call() {
-            pdConnectingToHost.dismiss();
+            pdConnectingToLobby.dismiss();
             FragmentsHelper.setFragment(getActivity(), R.id.rlContainer, new GameLobbyFragment());
         }
     };
@@ -83,8 +83,8 @@ public class GamesOnlineFragment extends Fragment {
         @Override
         public void call() {
             // fixme exception here if afk
-            pdConnectingToHost.dismiss();
-            adCantConnectToHost.show();
+            pdConnectingToLobby.dismiss();
+            adCantConnectToLobby.show();
         }
     };
 
@@ -92,7 +92,7 @@ public class GamesOnlineFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_games_online, container, false);
 
-        getActivity().setTitle(getActivity().getString(R.string.title_available_hosts));
+        getActivity().setTitle(getActivity().getString(R.string.title_available_services));
 
         initComponents(view);
         initNetworkHostsListener();
@@ -114,25 +114,25 @@ public class GamesOnlineFragment extends Fragment {
 
     void initComponents(View v) {
         fabCreateGame = (FloatingActionButton) v.findViewById(R.id.fabCreateGame);
-        fabUpdateHostsList = (FloatingActionButton) v.findViewById(R.id.fabUpdateHostsList);
+        fabUpdateLobbiesList = (FloatingActionButton) v.findViewById(R.id.fabUpdateHostsList);
 
-        rvHosts = (RecyclerView) v.findViewById(R.id.rvHosts);
-        rvHosts.setLayoutManager(new LinearLayoutManager(getActivity()));
+        rvLobbies = (RecyclerView) v.findViewById(R.id.rvHosts);
+        rvLobbies.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        pdHostUpdating = new ProgressDialog(getActivity());
-        pdHostUpdating.setTitle(R.string.msg_updating_host_list);
-        pdHostUpdating.setMessage(getString(R.string.text_please_wait));
+        pdLobbiesUpdating = new ProgressDialog(getActivity());
+        pdLobbiesUpdating.setTitle(R.string.msg_updating_host_list);
+        pdLobbiesUpdating.setMessage(getString(R.string.text_please_wait));
 
-        pdConnectingToHost = new ProgressDialog(getActivity());
-        pdConnectingToHost.setTitle(R.string.msg_connectingToHost);
-        pdConnectingToHost.setMessage(getString(R.string.text_please_wait));
+        pdConnectingToLobby = new ProgressDialog(getActivity());
+        pdConnectingToLobby.setTitle(R.string.msg_connectingToHost);
+        pdConnectingToLobby.setMessage(getString(R.string.text_please_wait));
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setCancelable(false);
-        builder.setTitle(R.string.dialog_title_connecting_to_host);
-        builder.setMessage(R.string.msg_cant_connect_to_host);
+        builder.setTitle(R.string.dialog_title_connecting_to_lobby);
+        builder.setMessage(R.string.msg_cant_connect_to_lobby);
         builder.setPositiveButton(R.string.text_ok, null);
-        adCantConnectToHost = builder.create();
+        adCantConnectToLobby = builder.create();
     }
 
     private void setButtonsListeners() {
@@ -141,7 +141,7 @@ public class GamesOnlineFragment extends Fragment {
             public void onClick(View v) {
 
                 Bundle bundle = new Bundle();
-                bundle.putBoolean(GameLobbyFragment.ARG_START_AS_HOST, true);
+                bundle.putBoolean(GameLobbyFragment.ARG_START_SERVICE, true);
 
                 GameLobbyFragment gameLobbyFragment = new GameLobbyFragment();
                 gameLobbyFragment.setArguments(bundle);
@@ -149,11 +149,11 @@ public class GamesOnlineFragment extends Fragment {
                 FragmentsHelper.setFragment(getActivity(), R.id.rlContainer, gameLobbyFragment);
             }
         });
-        fabUpdateHostsList.setOnClickListener(new View.OnClickListener() {
+        fabUpdateLobbiesList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                pdHostUpdating.show();
-                networkManager.discoverHosts(onDiscoverHostsDoneHandler);
+                pdLobbiesUpdating.show();
+                networkManager.discoverHosts(onDiscoverLobbiesDoneHandler);
             }
         });
     }

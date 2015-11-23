@@ -7,10 +7,9 @@ import java.sql.Time;
 /**
  * Created by robot on 15.11.15.
  */
-public class JsonHost {
-    public String hostName;
+public class JsonLobby {
+    public String serviceName;
     public String deviceName;
-    public int playersCount;
 
     public SalutDevice salutDevice;
 }

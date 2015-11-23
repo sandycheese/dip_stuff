@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.humanity.vs.cards.cardsvshumanity.R;
-import com.humanity.vs.cards.cardsvshumanity.ui.entities.JsonHost;
+import com.humanity.vs.cards.cardsvshumanity.ui.entities.JsonLobby;
 import com.humanity.vs.cards.cardsvshumanity.ui.network.NetworkManager;
 import com.peak.salut.Callbacks.SalutCallback;
 
@@ -17,18 +17,18 @@ import java.util.List;
 /**
  * Created by robot on 15.11.15.
  */
-public class HostsAdapter extends RecyclerView.Adapter<HostsAdapter.HostsViewHolder> {
+public class LobbiesAdapter extends RecyclerView.Adapter<LobbiesAdapter.HostsViewHolder> {
 
-    private List<JsonHost> items;
+    private List<JsonLobby> items;
     private NetworkManager networkManager;
     private SalutCallback startRegisteringCallback;
     private SalutCallback registerSuccessCallback;
     private SalutCallback registerFailCallback;
 
-    public HostsAdapter(List<JsonHost> hosts,
-                        NetworkManager networkManager,
-                        SalutCallback startRegisteringCallback, SalutCallback registerSuccessCallback,
-                        SalutCallback registerFailCallback) {
+    public LobbiesAdapter(List<JsonLobby> hosts,
+                          NetworkManager networkManager,
+                          SalutCallback startRegisteringCallback, SalutCallback registerSuccessCallback,
+                          SalutCallback registerFailCallback) {
         this.items = hosts;
         this.networkManager = networkManager;
         this.startRegisteringCallback = startRegisteringCallback;
@@ -50,10 +50,10 @@ public class HostsAdapter extends RecyclerView.Adapter<HostsAdapter.HostsViewHol
 
     @Override
     public void onBindViewHolder(HostsViewHolder holder, int position) {
-        final JsonHost item = items.get(position);
+        final JsonLobby item = items.get(position);
 
         holder.tvDeviceName.setText(item.deviceName);
-        holder.tvHostShortInfo.setText(String.format("%s", item.hostName));
+        holder.tvHostShortInfo.setText(String.format("%s", item.serviceName));
         holder.cvHost.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

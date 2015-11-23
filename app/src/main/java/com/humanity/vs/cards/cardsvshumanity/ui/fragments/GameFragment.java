@@ -184,7 +184,7 @@ public class GameFragment extends Fragment implements IGameUIUpdater {
         Bundle bundle = getArguments();
 
         if (bundle != null)
-            startAsHost = bundle.getBoolean(GameLobbyFragment.ARG_START_AS_HOST);
+            startAsHost = bundle.getBoolean(GameLobbyFragment.ARG_START_SERVICE);
 
         // HOST new game
         if (startAsHost) {
@@ -223,6 +223,8 @@ public class GameFragment extends Fragment implements IGameUIUpdater {
     @Override
     public void makeStage1Updates(JsonGameStage1Data jsonGameStage1Data, IClientStageCallback stageCallback) {
         this.stageCallback = stageCallback;
+
+        rvWhiteCards.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
 
         // check end game
         if (jsonGameStage1Data.endGame) {
@@ -284,8 +286,8 @@ public class GameFragment extends Fragment implements IGameUIUpdater {
 
         List<JsonWhiteCardsSelection> selections = Arrays.asList(jsonGameStage3Data.whiteCardsSelections);
 
-        rvWhiteCards.setAdapter(new SelectionAdapter(selections, selectedSelectionCallback));
         rvWhiteCards.setLayoutManager(new LinearLayoutManager(getActivity()));
+        rvWhiteCards.setAdapter(new SelectionAdapter(selections, selectedSelectionCallback));
 
         rvWhiteCards.setVisibility(View.VISIBLE);
         llMessageToPlayer.setVisibility(View.GONE);

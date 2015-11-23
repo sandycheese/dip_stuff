@@ -11,10 +11,10 @@
     <string name="text_ok">OK</string>
     <string name="msg_widi_unsupported_device">Your device doesn\'t support Wi-Fi Direct</string>
     <string name="error_message_app_error">Application is broken</string>
-    <string name="msg_unable_create_host">Unable to create a host</string>
-    <string name="dialog_title_connecting_to_host">Connecting to host</string>
-    <string name="msg_cant_connect_to_host">Can\'t connect to host</string>
-    <string name="title_available_hosts">Available hosts</string>
+    <string name="msg_unable_create_lobby">Unable to create a lobby</string>
+    <string name="dialog_title_connecting_to_lobby">Connecting to lobby</string>
+    <string name="msg_cant_connect_to_lobby">Can\'t connect to lobby</string>
+    <string name="title_available_services">Available lobbies</string>
     <string name="title_game_lobby">Game lobby</string>
     <string name="text_host">Host</string>
     <string name="text_client">Client</string>

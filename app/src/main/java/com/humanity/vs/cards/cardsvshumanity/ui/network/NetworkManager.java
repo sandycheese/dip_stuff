@@ -65,13 +65,13 @@ public class NetworkManager {
         network.unregisterClient(false);
     }
 
-    public void startHost(final SalutCallback clientConnectedCallback, final SalutCallback createHostFailCallback) {
+    public void startNetworkService(final SalutCallback clientConnectedCallback, final SalutCallback createServiceFailCallback) {
         network.startNetworkService(new SalutDeviceCallback() {
             @Override
             public void call(SalutDevice device) {
 
-                Log.d(App.TAG, "HOST: '" + device.readableName + "' has connected");
-                Log.d(App.TAG, "HOST: sleep a little (ms): " + SLEEP_BETWEEN_CONNECT_AND_SENDING_DATA);
+                Log.d(App.TAG, device.readableName + "' has connected");
+                Log.d(App.TAG, "sleep a little (ms): " + SLEEP_BETWEEN_CONNECT_AND_SENDING_DATA);
                 try {
                     Thread.sleep(SLEEP_BETWEEN_CONNECT_AND_SENDING_DATA);
                 } catch (InterruptedException e) {
@@ -83,14 +83,14 @@ public class NetworkManager {
         }, new SalutCallback() {
             @Override
             public void call() {
-                Log.d(App.TAG, "HOST: created successfully");
+                Log.d(App.TAG, "service created successfully");
             }
         }, new SalutCallback() {
             @Override
             public void call() {
-                Log.d(App.TAG, "HOST: failed to create");
+                Log.d(App.TAG, "service: failed to create");
                 network.stopNetworkService(false);
-                createHostFailCallback.call();
+                createServiceFailCallback.call();
             }
         });
     }
@@ -101,19 +101,19 @@ public class NetworkManager {
         network.discoverWithTimeout(new SalutCallback() {
             @Override
             public void call() {
-                Log.d(App.TAG, "CLIENT: host(s) found");
+                Log.d(App.TAG, "CLIENT: service(s) found");
                 doneCallback.call();
             }
         }, new SalutCallback() {
             @Override
             public void call() {
-                Log.d(App.TAG, "CLIENT: host(s) not found");
+                Log.d(App.TAG, "CLIENT: service(s) not found");
                 doneCallback.call();
             }
         }, 5000);
     }
 
-    public ArrayList<SalutDevice> getAllHosts() {
+    public ArrayList<SalutDevice> getAllDiscoveredDevices() {
         return network.foundDevices;
     }
 
@@ -169,5 +169,9 @@ public class NetworkManager {
             network.sendToAllDevices(data, failCallback);
         else
             network.sendToHost(data, failCallback);
+    }
+
+    public boolean isDeviceHost() {
+        return network.isRunningAsHost;
     }
 }
