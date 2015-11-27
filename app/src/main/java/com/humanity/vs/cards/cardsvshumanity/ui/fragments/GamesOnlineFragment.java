@@ -153,7 +153,7 @@ public class GamesOnlineFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 pdLobbiesUpdating.show();
-                networkManager.discoverHosts(onDiscoverLobbiesDoneHandler);
+                networkManager.discoverServices(onDiscoverLobbiesDoneHandler);
             }
         });
     }

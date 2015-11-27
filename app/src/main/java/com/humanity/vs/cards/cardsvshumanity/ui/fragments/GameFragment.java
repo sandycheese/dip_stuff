@@ -228,6 +228,7 @@ public class GameFragment extends Fragment implements IGameUIUpdater {
 
         // check end game
         if (jsonGameStage1Data.endGame) {
+            Log.d(App.TAG, "End game detected");
             getActivity().setTitle(getActivity().getString(R.string.text_end_game));
             // todo operations
             return;
@@ -271,6 +272,8 @@ public class GameFragment extends Fragment implements IGameUIUpdater {
                     Arrays.asList(playerWhiteCards.whiteCards),
                     selectedCardsCallback,
                     jsonGameStage1Data.blackCard.answersCount));
+        } else {
+            Log.d(App.TAG, "There is no white cards for player. Fix it.");
         }
 
     }
@@ -323,11 +326,13 @@ public class GameFragment extends Fragment implements IGameUIUpdater {
         }
 
         // UI
-        tvMessageToPlayer.setText(getActivity().getString(R.string.msg_you_selected_selection));
-        ivMessageToPlayer.setImageResource(R.drawable.ic_gesture_grey_700_48dp);
+        if (!networkManager.isDeviceHost()) {
+            tvMessageToPlayer.setText(getActivity().getString(R.string.msg_you_selected_selection));
+            ivMessageToPlayer.setImageResource(R.drawable.ic_gesture_grey_700_48dp);
 
-        rvWhiteCards.setVisibility(View.GONE);
-        llMessageToPlayer.setVisibility(View.VISIBLE);
+            rvWhiteCards.setVisibility(View.GONE);
+            llMessageToPlayer.setVisibility(View.VISIBLE);
+        }
     }
 
     boolean isCurrentPlayerKing(JsonPlayerState[] playerStates) {

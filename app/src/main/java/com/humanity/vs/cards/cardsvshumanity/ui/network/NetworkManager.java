@@ -95,19 +95,18 @@ public class NetworkManager {
         });
     }
 
-    // fixme make infinite loop?
-    public void discoverHosts(final SalutCallback doneCallback) {
+    public void discoverServices(final SalutCallback doneCallback) {
 
         network.discoverWithTimeout(new SalutCallback() {
             @Override
             public void call() {
-                Log.d(App.TAG, "CLIENT: service(s) found");
+                Log.d(App.TAG, "DISCOVERING: service(s) found");
                 doneCallback.call();
             }
         }, new SalutCallback() {
             @Override
             public void call() {
-                Log.d(App.TAG, "CLIENT: service(s) not found");
+                Log.d(App.TAG, "DISCOVERING: service(s) not found");
                 doneCallback.call();
             }
         }, 5000);
@@ -150,8 +149,7 @@ public class NetworkManager {
         return network.thisDevice;
     }
 
-    // fixme IT'S IMPOSSIBLE TO CONTROL WHO WILL BECOME THE HOST. CHANGE ARCHITECTURE. will send to everyone at first time
-    public void sendDataToAll(String classOfData, String jsonData) {
+    public void sendDataToDevice(String classOfData, String jsonData) {
         Log.d(App.TAG, "wanna send some data: " + classOfData);
 
         JsonGodLevelData data = new JsonGodLevelData();
@@ -161,7 +159,7 @@ public class NetworkManager {
         SalutCallback failCallback = new SalutCallback() {
             @Override
             public void call() {
-                Log.d(App.TAG, "Can't send data to host");
+                Log.d(App.TAG, "Can't send data to device");
             }
         };
 

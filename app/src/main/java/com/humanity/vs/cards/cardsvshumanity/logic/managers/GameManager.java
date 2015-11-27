@@ -16,7 +16,6 @@ import com.humanity.vs.cards.cardsvshumanity.logic.entities_json.JsonGameStage4D
 import com.humanity.vs.cards.cardsvshumanity.logic.entities_json.JsonRoundResult;
 import com.humanity.vs.cards.cardsvshumanity.logic.entities_json.JsonWhiteCardsSelection;
 import com.humanity.vs.cards.cardsvshumanity.logic.enums.NetworkGameCommand;
-import com.humanity.vs.cards.cardsvshumanity.logic.enums.NetworkGameCommandDirection;
 import com.humanity.vs.cards.cardsvshumanity.logic.helpers.GameManagerHelper;
 import com.humanity.vs.cards.cardsvshumanity.logic.interfaces.IGameUIUpdater;
 import com.humanity.vs.cards.cardsvshumanity.logic.interfaces.IHostStageCallback;
@@ -51,7 +50,7 @@ public class GameManager implements INetworkGameCommandsHandler {
     boolean startedAsHost = false;
     boolean startedAsClient = false;
 
-    private IClientStageCallback clientStageCallback = new IClientStageCallback() {
+    private IClientStageCallback clientNextStageCallerCallback = new IClientStageCallback() {
         @Override
         public void stage2_send_white_cards_selection(JsonGameStage2Data jsonGameStage2Data) {
             networkGameStage2_client_cmd(jsonGameStage2Data);
@@ -190,7 +189,7 @@ public class GameManager implements INetworkGameCommandsHandler {
     private void networkGameStage1_client_handler(JsonGameStage1Data jsonGameStage1Data) {
         Log.d(App.TAG, "networkGameStage1_client_handler");
 
-        gameUIUpdater.makeStage1Updates(jsonGameStage1Data, clientStageCallback);
+        gameUIUpdater.makeStage1Updates(jsonGameStage1Data, clientNextStageCallerCallback);
     }
 
     // STAGE 2: client sends back selected white cards;
@@ -234,7 +233,7 @@ public class GameManager implements INetworkGameCommandsHandler {
     private void networkGameStage3_client_handler(JsonGameStage3Data jsonGameStage3Data) {
         Log.d(App.TAG, "networkGameStage3_client_handler");
 
-        gameUIUpdater.makeStage3Updates(jsonGameStage3Data, clientStageCallback);
+        gameUIUpdater.makeStage3Updates(jsonGameStage3Data, clientNextStageCallerCallback);
     }
 
     // STAGE 4: client sends selected round winner cards;

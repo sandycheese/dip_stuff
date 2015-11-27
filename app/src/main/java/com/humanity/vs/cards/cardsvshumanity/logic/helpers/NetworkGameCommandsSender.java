@@ -8,7 +8,6 @@ import com.humanity.vs.cards.cardsvshumanity.logic.entities_json.JsonGameStage2D
 import com.humanity.vs.cards.cardsvshumanity.logic.entities_json.JsonGameStage3Data;
 import com.humanity.vs.cards.cardsvshumanity.logic.entities_json.JsonGameStage4Data;
 import com.humanity.vs.cards.cardsvshumanity.logic.enums.NetworkGameCommand;
-import com.humanity.vs.cards.cardsvshumanity.logic.enums.NetworkGameCommandDirection;
 import com.humanity.vs.cards.cardsvshumanity.logic.interfaces.INetworkGameCommandsSender;
 import com.humanity.vs.cards.cardsvshumanity.ui.network.NetworkManager;
 
@@ -44,8 +43,7 @@ public class NetworkGameCommandsSender implements INetworkGameCommandsSender {
                 break;
         }
 
-        // it's impossible to control wi-fi direct host choice
-        networkManager.sendDataToAll(dataClass, jsonData);
+        networkManager.sendDataToDevice(dataClass, jsonData);
     }
 
     @Override

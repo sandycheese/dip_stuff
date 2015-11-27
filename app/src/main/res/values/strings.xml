@@ -32,7 +32,7 @@
     <string name="text_question_done">Done?</string>
     <string name="text_yes">Yes</string>
     <string name="msg_you_selected_cards" formatted="false">Well done!\nWait until other players choose cards</string>
-    <string name="msg_you_selected_selection" formatted="false">You made your funny choice</string>
+    <string name="msg_you_selected_selection" formatted="false">You made your funny choice\nWait for new cards</string>
     <string name="msg_sent_to_the_king">Sent to The King</string>
     <string name="text_selected">Selected</string>
 </resources>

@@ -92,15 +92,17 @@ public class SelectionAdapter extends RecyclerView.Adapter<SelectionAdapter.Sele
             }
             holder.tvSelectionSelected.setText(R.string.text_selected);
 
+            boolean selectionFound = false;
             if (selectCallback != null) {
                 for (JsonWhiteCardsSelection selection : items) {
                     if (item.playerId.equals(selection.playerId)) {
                         selectCallback.selected(selection);
+                        selectionFound = true;
                         break;
                     }
                 }
-
-                Log.d(App.TAG, "Invalid behaviour: selected selection not found");
+                if (!selectionFound)
+                    Log.d(App.TAG, "Invalid behaviour: selected selection not found");
             }
         } else {
             selectedSelectionPlayerId = null;
