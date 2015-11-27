@@ -21,5 +21,12 @@
     <dimen name="white_cards_margin_left">2dp</dimen>
     <dimen name="white_cards_margin_right">2dp</dimen>
 
+    <!--text view each other margin-->
+    <dimen name="text_view_margin_left">16dp</dimen>
+
+    <dimen name="status_bar_height">24dp</dimen>
+
+
+
 
 </resources>

@@ -35,4 +35,6 @@
     <string name="msg_you_selected_selection" formatted="false">You made your funny choice\nWait for new cards</string>
     <string name="msg_sent_to_the_king">Sent to The King</string>
     <string name="text_selected">Selected</string>
+    <string name="text_the_king">The King</string>
+    <string name="text_pts">pts</string>
 </resources>

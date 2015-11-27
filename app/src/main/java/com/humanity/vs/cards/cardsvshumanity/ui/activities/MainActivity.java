@@ -11,6 +11,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.humanity.vs.cards.cardsvshumanity.R;
 import com.humanity.vs.cards.cardsvshumanity.logic.helpers.NetworkGameCommandsSender;
@@ -18,6 +19,7 @@ import com.humanity.vs.cards.cardsvshumanity.logic.interfaces.INetworkGameComman
 import com.humanity.vs.cards.cardsvshumanity.logic.managers.GameManager;
 import com.humanity.vs.cards.cardsvshumanity.ui.fragments.GamesOnlineFragment;
 import com.humanity.vs.cards.cardsvshumanity.ui.interfaces.IGameManagerProvider;
+import com.humanity.vs.cards.cardsvshumanity.ui.interfaces.INavMenuProvider;
 import com.humanity.vs.cards.cardsvshumanity.ui.interfaces.INetworkGameCommandsSenderProvider;
 import com.humanity.vs.cards.cardsvshumanity.ui.interfaces.INetworkManagerProvider;
 import com.humanity.vs.cards.cardsvshumanity.ui.network.AllNetworkDataHandler;
@@ -32,7 +34,7 @@ import com.peak.salut.SalutServiceData;
 // todo create empty views for recycle view
 // todo add wi-fi enabled check
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, INetworkManagerProvider, IGameManagerProvider, INetworkGameCommandsSenderProvider {
+        implements NavigationView.OnNavigationItemSelectedListener, INetworkManagerProvider, IGameManagerProvider, INetworkGameCommandsSenderProvider, INavMenuProvider {
 
     NetworkManager networkManager;
     AllNetworkDataHandler allNetworkDataHandler;
@@ -148,5 +150,10 @@ public class MainActivity extends AppCompatActivity
     @Override
     public INetworkGameCommandsSender getNetworkCommandsSender() {
         return this.networkGameCommandsSender;
+    }
+
+    @Override
+    public View getNavView() {
+        return findViewById(R.id.nav_view);
     }
 }

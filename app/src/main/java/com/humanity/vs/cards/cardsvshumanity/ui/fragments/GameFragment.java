@@ -19,6 +19,7 @@ import com.humanity.vs.cards.cardsvshumanity.App;
 import com.humanity.vs.cards.cardsvshumanity.R;
 import com.humanity.vs.cards.cardsvshumanity.logic.entities.GameClient;
 import com.humanity.vs.cards.cardsvshumanity.logic.entities.MatchRules;
+import com.humanity.vs.cards.cardsvshumanity.logic.entities.PlayerState;
 import com.humanity.vs.cards.cardsvshumanity.logic.entities_json.JsonCard;
 import com.humanity.vs.cards.cardsvshumanity.logic.entities_json.JsonGameStage1Data;
 import com.humanity.vs.cards.cardsvshumanity.logic.entities_json.JsonGameStage2Data;
@@ -36,6 +37,7 @@ import com.humanity.vs.cards.cardsvshumanity.logic.repositories.CardsRepository;
 import com.humanity.vs.cards.cardsvshumanity.ui.adapters.SelectionAdapter;
 import com.humanity.vs.cards.cardsvshumanity.ui.adapters.WhiteCardsAdapter;
 import com.humanity.vs.cards.cardsvshumanity.ui.interfaces.IGameManagerProvider;
+import com.humanity.vs.cards.cardsvshumanity.ui.interfaces.INavMenuProvider;
 import com.humanity.vs.cards.cardsvshumanity.ui.interfaces.INetworkGameCommandsSenderProvider;
 import com.humanity.vs.cards.cardsvshumanity.ui.interfaces.INetworkManagerProvider;
 import com.humanity.vs.cards.cardsvshumanity.ui.network.NetworkManager;
@@ -71,6 +73,10 @@ public class GameFragment extends Fragment implements IGameUIUpdater {
     TextView tvMessageToPlayer;
     ImageView ivMessageToPlayer;
     Snackbar sbSendSelectedCards = null;
+
+    //from activity
+    TextView tvPlayersNames;
+    TextView tvScores;
 
     boolean isKingNow = false;
 
@@ -171,10 +177,15 @@ public class GameFragment extends Fragment implements IGameUIUpdater {
         Activity activity = getActivity();
         if (activity instanceof IGameManagerProvider &&
                 activity instanceof INetworkGameCommandsSenderProvider &&
-                activity instanceof INetworkManagerProvider) {
+                activity instanceof INetworkManagerProvider &&
+                activity instanceof INavMenuProvider) {
             gameManager = ((IGameManagerProvider) activity).getGameManager();
             networkCommandsSender = ((INetworkGameCommandsSenderProvider) activity).getNetworkCommandsSender();
             networkManager = ((INetworkManagerProvider) activity).getNetworkManager();
+
+            View nav = ((INavMenuProvider) getActivity()).getNavView();
+            tvPlayersNames = (TextView) nav.findViewById(R.id.tvPlayersNames);
+            tvScores = (TextView) nav.findViewById(R.id.tvPlayersScore);
         } else {
             ErrorsHelper.commonError(activity);
             // todo make operations
@@ -235,7 +246,25 @@ public class GameFragment extends Fragment implements IGameUIUpdater {
         }
 
         // check round result
-        // todo implement
+        if (tvPlayersNames != null && tvScores != null) {
+            String playersNames = "";
+            String playersScores = "";
+
+            int i = 0;
+            for (JsonPlayerState p : jsonGameStage1Data.playerStates) {
+                String newLine = i != jsonGameStage1Data.playerStates.length ? "\n" : "";
+
+                String isKingText = p.isKing ? String.format("(%s)", getText(R.string.text_the_king)) : "";
+
+                playersNames += p.nickname + isKingText + newLine;
+                playersScores += p.score + (String) getText(R.string.text_pts) + newLine;
+
+                i++;
+            }
+
+            tvPlayersNames.setText(playersNames);
+            tvScores.setText(playersScores);
+        }
 
         // check is king
         isKingNow = isCurrentPlayerKing(jsonGameStage1Data.playerStates);
