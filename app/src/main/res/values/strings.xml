@@ -37,4 +37,6 @@
     <string name="text_selected">Selected</string>
     <string name="text_the_king">The King</string>
     <string name="text_pts">pts</string>
+    <string name="msg_press_big_button_to_create_game">Press the big circle button to create a funny game</string>
+    <string name="text_score">Score</string>
 </resources>

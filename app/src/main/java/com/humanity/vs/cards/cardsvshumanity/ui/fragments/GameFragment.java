@@ -74,9 +74,11 @@ public class GameFragment extends Fragment implements IGameUIUpdater {
     ImageView ivMessageToPlayer;
     Snackbar sbSendSelectedCards = null;
 
-    //from activity
+    // views for score
     TextView tvPlayersNames;
     TextView tvScores;
+    TextView tvBigMenuLabel;
+    LinearLayout llPlayersAndScore;
 
     boolean isKingNow = false;
 
@@ -186,6 +188,8 @@ public class GameFragment extends Fragment implements IGameUIUpdater {
             View nav = ((INavMenuProvider) getActivity()).getNavView();
             tvPlayersNames = (TextView) nav.findViewById(R.id.tvPlayersNames);
             tvScores = (TextView) nav.findViewById(R.id.tvPlayersScore);
+            llPlayersAndScore = (LinearLayout) nav.findViewById(R.id.llPlayersScore);
+            tvBigMenuLabel = (TextView) nav.findViewById(R.id.tvNavMenuBigLabel);
         } else {
             ErrorsHelper.commonError(activity);
             // todo make operations
@@ -246,7 +250,10 @@ public class GameFragment extends Fragment implements IGameUIUpdater {
         }
 
         // check round result
-        if (tvPlayersNames != null && tvScores != null) {
+        if (tvPlayersNames != null && tvScores != null && tvBigMenuLabel != null && llPlayersAndScore != null) {
+            llPlayersAndScore.setVisibility(View.VISIBLE);
+            tvBigMenuLabel.setText(getText(R.string.text_score));
+
             String playersNames = "";
             String playersScores = "";
 

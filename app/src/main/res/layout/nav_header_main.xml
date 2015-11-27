@@ -18,27 +18,39 @@
         android:paddingTop="@dimen/nav_header_vertical_spacing"
         android:src="@drawable/ic_mood_grey_700_48dp" />
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/msg_press_big_button_to_create_game"
+        android:id="@+id/tvNavMenuBigLabel"
+        android:paddingTop="@dimen/nav_header_vertical_spacing"
+        android:layout_gravity="center_horizontal" />
+
     <LinearLayout
         android:id="@+id/llPlayersScore"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal"
-        android:paddingTop="@dimen/nav_header_vertical_spacing">
+        android:paddingTop="@dimen/nav_header_vertical_spacing"
+        android:visibility="gone">
 
 
         <TextView
             android:id="@+id/tvPlayersNames"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:lineSpacingExtra="@dimen/game_card_text_vertical_spacing"
-            android:textColor="#ffffff" />
+            android:text="banana (The King)\nLG Leon"
+            android:lineSpacingExtra="@dimen/game_card_text_vertical_spacing" />
 
         <TextView
             android:id="@+id/tvPlayersScore"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:text="0\n2"
             android:layout_marginLeft="@dimen/text_view_margin_left"
-            android:lineSpacingExtra="@dimen/game_card_text_vertical_spacing" />
+            android:lineSpacingExtra="@dimen/game_card_text_vertical_spacing"
+            android:gravity="right" />
 
     </LinearLayout>
 </LinearLayout>
